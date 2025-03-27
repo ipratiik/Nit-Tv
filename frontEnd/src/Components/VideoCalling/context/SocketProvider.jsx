@@ -10,8 +10,46 @@ export const useSocket = () => {
 };
 
 export default function SocketProvider(props) {
-    const socket = io("https://manittv.up.railway.app:8000")
-    // const socket = io("http://localhost:8000")
+    // Socket for video chat signaling
+    const socket = useMemo(
+        () =>
+            io("wss://manittv.up.railway.app", {
+                transports: ["websocket"], // Force WebSocket transport to avoid polling issues
+                reconnection: true, // Enable reconnection
+                reconnectionAttempts: 5, // Number of reconnection attempts
+                reconnectionDelay: 1000, // Delay between reconnection attempts (1 second)
+            }),
+        []
+    );
+
+    useEffect(() => {
+        // Log connection status
+        socket.on("connect", () => {
+            console.log("Socket connected:", socket.id);
+        });
+        socket.on("connect_error", (error) => {
+            console.error("Socket connection error:", error);
+        });
+        socket.on("disconnect", (reason) => {
+            console.log("Socket disconnected:", reason);
+        });
+        socket.on("reconnect", (attempt) => {
+            console.log("Socket reconnected after attempt:", attempt);
+        });
+        socket.on("reconnect_failed", () => {
+            console.error("Socket reconnection failed");
+        });
+
+        // Handle any unexpected errors
+        socket.on("error", (error) => {
+            console.error("Socket error:", error);
+        });
+
+        // Cleanup on unmount
+        return () => {
+            socket.disconnect();
+        };
+    }, [socket]);
 
     return (
         <SocketContext.Provider value={socket}>
