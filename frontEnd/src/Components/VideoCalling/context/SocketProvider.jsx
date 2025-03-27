@@ -10,14 +10,14 @@ export const useSocket = () => {
 };
 
 export default function SocketProvider(props) {
-    // Socket for video chat signaling (port 8000)
+    // Socket for video chat signaling (using the public Railway URL)
     const socket = useMemo(
         () =>
-            io("wss://10.64.53.109:8000", {
-                transports: ["websocket", "polling"], // Allow fallback to polling if WebSocket fails
-                reconnection: true,
-                reconnectionAttempts: 5,
-                reconnectionDelay: 1000,
+            io("wss://manittv.up.railway.app", {
+                transports: ["websocket", "polling"],
+                reconnection: true, // Enable reconnection
+                reconnectionAttempts: 5, // Number of reconnection attempts
+                reconnectionDelay: 1000, // Delay between reconnection attempts (1 second)
             }),
         []
     );
@@ -28,7 +28,8 @@ export default function SocketProvider(props) {
             console.log("Socket connected:", socket.id);
         });
         socket.on("connect_error", (error) => {
-            console.error("Socket connection error:", error);
+            console.error("Socket connection error:", error.message);
+            console.error("Error details:", error);
         });
         socket.on("disconnect", (reason) => {
             console.log("Socket disconnected:", reason);

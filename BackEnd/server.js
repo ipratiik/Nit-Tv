@@ -1,19 +1,29 @@
 const express = require("express");
-const https = require("https");
+const http = require("http");
 const { Server } = require("socket.io");
-const fs = require("fs");
 
 const app = express();
 
-const serverOptions = {
-    cert: fs.readFileSync("../localhost-cert.pem"),
-    key: fs.readFileSync("../localhost-key.pem"),
-};
+// Middleware to parse JSON (optional, if you need to handle JSON requests)
+app.use(express.json());
 
-const server = https.createServer(serverOptions, app);
+// Add a basic route for testing the server
+app.get("/", (req, res) => {
+    res.send("Express + Socket.IO server is running!");
+});
+
+// Create an HTTP server (Railway handles HTTPS externally)
+const server = http.createServer(app);
+
+// Initialize Socket.IO with CORS configuration
 const io = new Server(server, {
     cors: {
-        origin: ["http://localhost:5173", "https://10.64.53.109:5173"], // Allow both origins
+        origin: [
+            "http://localhost:5173",
+            "http://192.168.0.118:5173",
+            "https://10.64.53.109:5173",
+            "https://manitv.vercel.app", // Your deployed frontend URL
+        ],
         methods: ["GET", "POST"],
     },
 });
@@ -112,8 +122,8 @@ function leaveRoom(socket, roomId) {
     }
 }
 
-// Start the server on port 8000
-const PORT = 8000;
+// Use the port provided by the hosting platform (e.g., Railway) or 8000 for local testing
+const PORT = process.env.PORT || 8000;
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
