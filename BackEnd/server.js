@@ -22,9 +22,9 @@ const io = new Server(server, {
             "http://localhost:5173",
             "http://192.168.0.118:5173",
             "https://10.64.53.109:5173",
-            "https://manitv.vercel.app", // Your deployed frontend URL
+            "https://manitv.vercel.app", 
         ],
-        methods: ["GET", "POST"],
+        credentials: true,
     },
 });
 
