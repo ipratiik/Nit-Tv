@@ -13,7 +13,7 @@ export default function SocketProvider(props) {
     // Socket for video chat signaling (using the public Railway URL)
     const socket = useMemo(
         () =>
-            io("http://manittv.up.railway.app:8000", {
+            io("https://manittv.up.railway.app", {
                 transports: ["websocket", "polling"],
                 reconnection: true, // Enable reconnection
                 reconnectionAttempts: 5, // Number of reconnection attempts

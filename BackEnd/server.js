@@ -122,7 +122,6 @@ function leaveRoom(socket, roomId) {
     }
 }
 
-// Use the port provided by the hosting platform (e.g., Railway) or 8000 for local testing
 const PORT = process.env.PORT || 8000;
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
