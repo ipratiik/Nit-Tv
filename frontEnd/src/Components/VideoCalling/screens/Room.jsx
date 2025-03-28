@@ -72,7 +72,7 @@ const Room = () => {
                 console.log("ontrack event fired");
                 console.log("Received remote stream:", event.streams[0]);
                 setRemoteStream(event.streams[0]);
-            };
+            } ;
 
             // Log connection state changes
             peerInstance.current.webRTCPeer.onconnectionstatechange = () => {
