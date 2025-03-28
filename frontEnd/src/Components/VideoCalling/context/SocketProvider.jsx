@@ -13,7 +13,7 @@ export default function SocketProvider(props) {
     // Socket for video chat signaling
     const socket = useMemo(
         () =>
-            io("https://manittv-production.up.railway.app/", {
+            io("wss://manittv-production.up.railway.app/", {
             // io("http://localhost:8000", {
                 transports: ["websocket"], // Force WebSocket transport to avoid polling issues
                 reconnection: true, // Enable reconnection
@@ -46,10 +46,6 @@ export default function SocketProvider(props) {
             console.error("Socket error:", error);
         });
 
-        // Cleanup on unmount
-        return () => {
-            socket.disconnect();
-        };
     }, [socket]);
 
     return (
