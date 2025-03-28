@@ -14,7 +14,6 @@ const Room = () => {
     const localVideoRef = useRef(null); // Ref for local video element
     const remoteVideoRef = useRef(null); // Ref for remote video element
 
-    // Initialize local stream when the component mounts
     useEffect(() => {
         const initLocalStream = async () => {
             try {
@@ -22,27 +21,23 @@ const Room = () => {
                     video: true,
                     audio: true,
                 });
+                console.log("Local stream initialized:", stream);
                 setLocalStream(stream);
-                if (localVideoRef.current) {
-                    localVideoRef.current.srcObject = stream;
-                    console.log("Local stream set on video element");
-                }
             } catch (error) {
-                console.error("Error accessing media devices:", error);
+                console.error("Error accessing media devices:", error.name, error.message);
+                if (error.name === "NotAllowedError") {
+                    console.warn("Permissions denied for camera/microphone.");
+                } else if (error.name === "NotFoundError") {
+                    console.warn("No camera/microphone found.");
+                }
             }
         };
         initLocalStream();
 
-        // Cleanup on unmount
         return () => {
             if (localStream) {
+                console.log("Cleaning up local stream");
                 localStream.getTracks().forEach((track) => track.stop());
-            }
-            if (remoteStream) {
-                remoteStream.getTracks().forEach((track) => track.stop());
-            }
-            if (peerInstance.current) {
-                peerInstance.current.webRTCPeer.close();
             }
         };
     }, []);
