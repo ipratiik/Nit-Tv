@@ -52,15 +52,7 @@ const Room = () => {
         }
     }, [localStream]);
 
-    // useEffect(() => {
-    //     if (localStream) {
-    //         localStream.getTracks().forEach(track => {
-    //             console.log(`added now Track ${track.kind} is active: ${track.readyState}`);
-    //         });
-    //     }
-    // }, [localStream]);
-    
-    
+
 
     // Set the remote stream on the video element when the stream or ref changes
     useEffect(() => {
@@ -293,11 +285,9 @@ const Room = () => {
 
     return (
         <div className="room-container">
-            <h1>Video Chat Room</h1>
             <div className="video-container">
                 {/* Local Video Window */}
                 <div className="video-box local-video">
-                    <h3>Your Video</h3>
                     {localStream ? (
                         <video ref={localVideoRef} autoPlay muted playsInline />
                     ) : (
@@ -307,7 +297,6 @@ const Room = () => {
 
                 {/* Remote Video Window */}
                 <div className="video-box remote-video">
-                    <h3>Stranger's Video</h3>
                     {remoteStream ? (
                         <video ref={remoteVideoRef} autoPlay playsInline />
                     ) : (
@@ -317,22 +306,38 @@ const Room = () => {
                     )}
                 </div>
             </div>
-            <div className="controls">
-                {!isStarted ? (
-                    <button onClick={handleStart}>Start</button>
-                ) : (
-                    <>
-                        {waiting && !remoteStream ? (
-                            <p>Waiting for another user...</p>
-                        ) : (
-                            <>
-                                <button onClick={handleNext}>Next</button>
-                                <button onClick={handleStop}>Stop</button>
-                            </>
-                        )}
-                    </>
-                )}
-            </div>
+            <section className="button_chat">
+                <div className="controls">
+                    {!isStarted ? (
+                        <button onClick={handleStart}>Start</button>
+                    ) : (
+                        <>
+                            {waiting && !remoteStream ? (
+                                <p>Waiting for another user...</p>
+                            ) : (
+                                <>
+                                    <button onClick={handleNext}>Next</button>
+                                    <button onClick={handleStop}>Stop</button>
+                                </>
+                            )}
+                        </>
+                    )}
+                </div>
+
+                <div className="chat-container">
+                    <div className="chat-box">
+                        <div className="messages">
+                            {/* Messages will be displayed here */}
+                        </div>
+                    </div>
+                    <div className="chat-input">
+                        <input type="text" placeholder="Type a message..." />
+                        <button>Send</button>
+                    </div>
+                </div>
+
+
+            </section>
         </div>
     );
 };

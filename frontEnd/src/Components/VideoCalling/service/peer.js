@@ -32,7 +32,6 @@ class PeerService {
             return ans;
         }
     }
-    // C:\Users\user\Desktop\Practice Project\webrtc\TestFrontend
     async setLocalDescription(ans) {
         if (this.webRTCPeer) {
             await this.webRTCPeer.setLocalDescription(new RTCSessionDescription(ans));
