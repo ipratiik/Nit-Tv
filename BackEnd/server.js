@@ -7,6 +7,9 @@ const server = app.listen( 8000, () => {
     console.log(`Server running on port 8000}`);
 });
 
+app.get("/", (req, response) =>{
+    response.send("api is working fine")    
+})
 const io = new Server(server, {
     cors: {
         origin: ["http://localhost:5173", "https://manitv.vercel.app"], // Allow your deployed frontend
