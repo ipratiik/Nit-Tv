@@ -13,7 +13,7 @@ app.get("/", (req, response) =>{
 
 const io = new Server(server, {
     cors: {
-        origin: ["http://localhost:5173", "https://manitv.vercel.app", "https://manitv.live"], // Allow your deployed frontend
+        origin: ["http://localhost:5173", "https://manitv.vercel.app", "https://manitv.live"], 
         methods: ["GET", "POST"],
     },
 });

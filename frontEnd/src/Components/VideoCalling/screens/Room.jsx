@@ -13,6 +13,8 @@ const Room = () => {
     const peerInstance = useRef(null); // Store the PeerService instance
     const localVideoRef = useRef(null); // Ref for local video element
     const remoteVideoRef = useRef(null); // Ref for remote video element
+    const [message, setMessage] = useState("");
+    const [messageArray, setMessageArray] = useState([]);
 
     useEffect(() => {
         const initLocalStream = async () => {
@@ -283,6 +285,10 @@ const Room = () => {
         socket.emit("stop", roomId);
     };
 
+    const sendMessage = () =>{
+        if(!roomId) return;
+        console.log(message);
+    }
     return (
         <div className="room-container">
             <div className="video-container">
@@ -331,8 +337,8 @@ const Room = () => {
                         </div>
                     </div>
                     <div className="chat-input">
-                        <input type="text" placeholder="Type a message..." />
-                        <button>Send</button>
+                        <input onChange={(e)=> {setMessage(e.current.value)}} type="text" placeholder="Type a message..." />
+                        <button onClick={sendMessage} >Send</button>
                     </div>
                 </div>
 
