@@ -14,6 +14,7 @@ const Room = () => {
     const localVideoRef = useRef(null); // Ref for local video element
     const remoteVideoRef = useRef(null); // Ref for remote video element
 
+    // Initialize local stream when the component mounts
     useEffect(() => {
         const initLocalStream = async () => {
             try {
@@ -26,14 +27,15 @@ const Room = () => {
             } catch (error) {
                 console.error("Error accessing media devices:", error.name, error.message);
                 if (error.name === "NotAllowedError") {
-                    console.warn("Permissions denied for camera/microphone.");
+                    alert("Camera/microphone permissions denied. Please allow access.");
                 } else if (error.name === "NotFoundError") {
-                    console.warn("No camera/microphone found.");
+                    alert("No camera or microphone found on this device.");
                 }
             }
         };
         initLocalStream();
 
+        // Cleanup on unmount
         return () => {
             if (localStream) {
                 console.log("Cleaning up local stream");
@@ -42,23 +44,40 @@ const Room = () => {
         };
     }, []);
 
+    // Assign local stream to video element when available
+    useEffect(() => {
+        if (localStream && localVideoRef.current) {
+            console.log("Assigning local stream to video element");
+            localVideoRef.current.srcObject = localStream;
+        }
+    }, [localStream]);
+
     // Set the remote stream on the video element when the stream or ref changes
     useEffect(() => {
         if (remoteStream && remoteVideoRef.current) {
+            console.log("Assigning remote stream to video element");
             remoteVideoRef.current.srcObject = remoteStream;
-            console.log("Remote stream set on video element via useEffect");
         }
-    }, [remoteStream, remoteVideoRef]);
+    }, [remoteStream]);
 
     // Handle socket events
     useEffect(() => {
         if (!socket || !isStarted) return;
 
+        // Socket connection error handling
+        socket.on("connect_error", (error) => {
+            console.error("Socket connection error:", error);
+        });
+
+        socket.on("disconnect", (reason) => {
+            console.log("Socket disconnected:", reason);
+        });
+
         // When matched with another user
         socket.on("join-room", async ({ roomId, from }) => {
             console.log(`Joined room ${roomId} with user ${from}`);
             setRoomId(roomId);
-            setWaiting(false);
+28.setWaiting(false);
             peerInstance.current = new PeerService(); // Create a new PeerService instance
 
             // Add local stream to the peer connection
@@ -69,31 +88,28 @@ const Room = () => {
 
             // Listen for remote stream
             peerInstance.current.webRTCPeer.ontrack = (event) => {
-                console.log("ontrack event fired");
                 console.log("Received remote stream:", event.streams[0]);
                 setRemoteStream(event.streams[0]);
-            } ;
+            };
 
             // Log connection state changes
             peerInstance.current.webRTCPeer.onconnectionstatechange = () => {
-                console.log(
-                    "Connection state:",
-                    peerInstance.current.webRTCPeer.connectionState
-                );
+                console.log("Connection state:", peerInstance.current.webRTCPeer.connectionState);
             };
 
             // Log ICE connection state changes
             peerInstance.current.webRTCPeer.oniceconnectionstatechange = () => {
-                console.log(
-                    "ICE connection state:",
-                    peerInstance.current.webRTCPeer.iceConnectionState
-                );
+                const state = peerInstance.current.webRTCPeer.iceConnectionState;
+                console.log("ICE connection state:", state);
+                if (state === "failed" || state === "closed") {
+                    console.error("ICE connection failed or closed unexpectedly");
+                }
             };
 
             // Handle ICE candidates
             peerInstance.current.webRTCPeer.onicecandidate = (event) => {
                 if (event.candidate) {
-                    console.log("Sending ICE candidate");
+                    console.log("Sending ICE candidate:", event.candidate);
                     socket.emit("ice-candidate", {
                         candidate: event.candidate,
                         to: from,
@@ -103,10 +119,13 @@ const Room = () => {
 
             // Decide which peer creates the offer based on socket IDs
             if (socket.id < from) {
-                // This peer creates the offer
                 console.log("This peer is the offerer");
-                const offer = await peerInstance.current.getOffer();
-                socket.emit("offer", { offer, roomId, to: from });
+                try {
+                    const offer = await peerInstance.current.getOffer();
+                    socket.emit("offer", { offer, roomId, to: from });
+                } catch (error) {
+                    console.error("Error creating offer:", error);
+                }
             } else {
                 console.log("This peer will wait for an offer");
             }
@@ -118,43 +137,30 @@ const Room = () => {
             setRoomId(roomId);
             setWaiting(false);
 
-            // If we already have a peer instance, don't create a new one
             if (!peerInstance.current) {
                 peerInstance.current = new PeerService();
 
-                // Add local stream to the peer connection
                 localStream.getTracks().forEach((track) =>
                     peerInstance.current.webRTCPeer.addTrack(track, localStream)
                 );
                 console.log("Local stream tracks added to peer connection");
 
-                // Listen for remote stream
                 peerInstance.current.webRTCPeer.ontrack = (event) => {
-                    console.log("ontrack event fired");
                     console.log("Received remote stream:", event.streams[0]);
                     setRemoteStream(event.streams[0]);
                 };
 
-                // Log connection state changes
                 peerInstance.current.webRTCPeer.onconnectionstatechange = () => {
-                    console.log(
-                        "Connection state:",
-                        peerInstance.current.webRTCPeer.connectionState
-                    );
+                    console.log("Connection state:", peerInstance.current.webRTCPeer.connectionState);
                 };
 
-                // Log ICE connection state changes
                 peerInstance.current.webRTCPeer.oniceconnectionstatechange = () => {
-                    console.log(
-                        "ICE connection state:",
-                        peerInstance.current.webRTCPeer.iceConnectionState
-                    );
+                    console.log("ICE connection state:", peerInstance.current.webRTCPeer.iceConnectionState);
                 };
 
-                // Handle ICE candidates
                 peerInstance.current.webRTCPeer.onicecandidate = (event) => {
                     if (event.candidate) {
-                        console.log("Sending ICE candidate");
+                        console.log("Sending ICE candidate:", event.candidate);
                         socket.emit("ice-candidate", {
                             candidate: event.candidate,
                             to: from,
@@ -163,7 +169,6 @@ const Room = () => {
                 };
             }
 
-            // Set the remote offer and create an answer
             try {
                 await peerInstance.current.setRemoteDescription(offer);
                 const answer = await peerInstance.current.getAnswer(offer);
@@ -226,12 +231,19 @@ const Room = () => {
 
         // Cleanup socket listeners on unmount
         return () => {
+            console.log("Cleaning up socket listeners and peer connection");
+            socket.off("connect_error");
+            socket.off("disconnect");
             socket.off("join-room");
             socket.off("offer");
             socket.off("answer");
             socket.off("ice-candidate");
             socket.off("user-left");
             socket.off("waiting");
+            if (peerInstance.current) {
+                peerInstance.current.webRTCPeer.close();
+                peerInstance.current = null;
+            }
         };
     }, [socket, isStarted, localStream]);
 
