@@ -44,15 +44,6 @@ const Room = () => {
 
 
     useEffect(() => {
-        if (localStream && localVideoRef.current) {
-            console.log("Just added Assigning local stream to video element");
-            localVideoRef.current.srcObject = localStream;
-        } else {
-            console.log("Just added Local stream or video ref is missing");
-        }
-    }, [localStream]);
-
-    useEffect(() => {
         if (localStream) {
             localStream.getTracks().forEach(track => {
                 console.log(`added now Track ${track.kind} is active: ${track.readyState}`);
