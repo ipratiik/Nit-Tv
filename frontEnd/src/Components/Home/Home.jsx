@@ -27,7 +27,6 @@ export default function Home() {
     const [user, setUser] = useState(null);
     const [error, setError] = useState("");
 
-    // 🔹 Keep user logged in even after refresh
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (loggedInUser) => {
             if (loggedInUser) {
