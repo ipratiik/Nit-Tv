@@ -1,83 +1,71 @@
-Manit TV 🎥
+# Manit TV 🎥
 
 Manit TV is an Omegle-style video chat platform exclusively for NIT students. It allows students to connect via random 1-on-1 video chats, ensuring a safe and exclusive environment for networking and discussions.
 
-🚀 Features
+## 🚀 Features
 
-🔒 NIT-Exclusive Access: Only students with @stu.manit.ac.in and @nit.ac.in emails can log in.
+* **🔒 NIT-Exclusive Access:** Only students with `@stu.manit.ac.in` and `@nit.ac.in` emails can log in.
+* **📹 Random 1-on-1 Video Chat:** Get paired with other NIT students for real-time conversations.
+* **⚡ Firebase Authentication:** Secure login with Google authentication.
+* **🎥 WebRTC for Video Streaming:** Peer-to-peer video calls without servers storing any data.
+* **📡 Real-time Matching System:** Instantly connects users with available peers.
 
-📹 Random 1-on-1 Video Chat: Get paired with other NIT students for real-time conversations.
+## 🛠 Tech Stack
 
-⚡ Firebase Authentication: Secure login with Google authentication.
+* **Frontend:** React.js
+* **Backend:** Firebase (Authentication, Firestore for real-time matching)
+* **Video Streaming:** WebRTC
+* **Hosting:** Firebase Hosting / Vercel
 
-🎥 WebRTC for Video Streaming: Peer-to-peer video calls without servers storing any data.
+## 📦 Installation & Setup
 
-📡 Real-time Matching System: Instantly connects users with available peers.
+1.  **Clone the repository:**
 
-🛠 Tech Stack
+    ```bash
+    git clone https://github.com/your-username/manit-tv](https://github.com/ankitsingh2105/ManitTV.git
+    cd manit-tv
+    ```
 
-Frontend: React.js
+2.  **Install dependencies:**
 
-Backend: Firebase (Authentication, Firestore for real-time matching)
+    ```bash
+    npm install
+    ```
 
-Video Streaming: WebRTC
+3.  **Set up Firebase:**
 
-Hosting: Firebase Hosting / Vercel
+    * Create a Firebase project.
+    * Enable Google Authentication.
+    * Add your Firebase config to the project.
 
-📦 Installation & Setup
+4.  **Start the development server:**
 
-Clone the repository:
+    ```bash
+    npm start
+    ```
 
-git clone https://github.com/your-username/manit-tv.git
-cd manit-tv
-
-Install dependencies:
-
-npm install
-
-Set up Firebase:
-
-Create a Firebase project
-
-Enable Google Authentication
-
-Add your Firebase config to the project
-
-Start the development server:
-
-npm start
-
-🔑 Authentication
+## 🔑 Authentication
 
 Manit TV uses Firebase Authentication to restrict access to NIT students only. Users must sign in with Google, and only emails ending in:
 
-@stu.manit.ac.in
-
-@nit.ac.in
+* `@stu.manit.ac.in`
 
 will be allowed.
 
-🖥 How It Works
+## 🖥 How It Works
 
-User logs in using Google Authentication.
-
-Email is verified (must belong to an NIT domain).
-
-If valid, the user is matched with another available NIT student.
-
-WebRTC handles the video call directly between users.
-
-When a chat ends, users can connect to a new random partner.
-
-🎯 To-Do
+1.  User logs in using Google Authentication.
+2.  Email is verified (must belong to an NIT domain).
+3.  If valid, the user is matched with another available NIT student.
+4.  WebRTC handles the video call directly between users.
+5.  When a chat ends, users can connect to a new random partner.
 
 
-
-🤝 Contributing
+## 🤝 Contributing
 
 Feel free to fork the repo and submit PRs! Open to feedback and suggestions.
 
-📜 License
+## 📜 License
 
 MIT License © 2025 Manit TV
 
