@@ -62,13 +62,9 @@ io.on("connection", (socket) => {
         io.to(to).emit("ice-candidate", { candidate, from: socket.id });
     });
 
-    socket.on("chat-message", ({ roomId, message }) => {
+    socket.on("chat-message", ({ roomId, message, mySocketID }) => {
         console.log(`Received message in server:`, message, "for room:", roomId);
-        if (!roomId) {
-            console.error("No roomId provided, message ignored.");
-            return;
-        }
-        io.to(roomId).emit("chat-message", { roomId, message });
+        io.emit("chat-message", { roomId, message, mySocketId : mySocketID });
     });
 
 
@@ -114,7 +110,7 @@ function leaveRoom(socket, roomId) {
     if (roomId && rooms.has(roomId)) {
         const users = rooms.get(roomId);
         const otherUserId = users.find((id) => id !== socket.id);
-        if (otherUserId) {
+        if (otherUserId) { 
             io.to(otherUserId).emit("user-left", { roomId });
         }
         socket.leave(roomId);

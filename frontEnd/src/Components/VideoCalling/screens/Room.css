@@ -97,11 +97,13 @@ p {
     border-radius: 8px;
     margin-bottom: 10px;
     border: 1px solid black;
+    color: black;
 }
 
 .messages {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
     gap: 8px;
 }
 
