@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { useSocket } from "../context/SocketProvider"; // Import the socket hook
 import PeerService from "../service/peer"; // Import the PeerService class
 import "./Room.css"; // Import styles
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Room = () => {
     const socket = useSocket(); // Get the socket instance
@@ -285,12 +287,18 @@ const Room = () => {
         socket.emit("stop", roomId);
     };
 
-    const sendMessage = () =>{
-        if(!roomId) return;
-        console.log(message);
-    }
+    const sendMessage = () => {
+        if (!roomId) {
+            toast.success("Cannot send message before other user arrival");
+            return;
+        }
+        console.log("Sending message: ", message, "to room:", roomId);
+        socket.emit("chat-message", { roomId, message });
+    };
+
     return (
         <div className="room-container">
+            <ToastContainer />
             <div className="video-container">
                 {/* Local Video Window */}
                 <div className="video-box local-video">
@@ -337,7 +345,7 @@ const Room = () => {
                         </div>
                     </div>
                     <div className="chat-input">
-                        <input onChange={(e)=> {setMessage(e.current.value)}} type="text" placeholder="Type a message..." />
+                        <input onChange={(e) => { setMessage(e.target.value) }} type="text" placeholder="Type a message..." />
                         <button onClick={sendMessage} >Send</button>
                     </div>
                 </div>

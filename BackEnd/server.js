@@ -3,17 +3,17 @@ const { Server } = require("socket.io");
 
 const app = express();
 
-const server = app.listen( 8000, () => {
-    console.log(`Server running on port 8000}`);
+const server = app.listen(8000, () => {
+    console.log(`Server running on port 8000`);
 });
 
-app.get("/", (req, response) =>{
-    response.send("api is working fine")    
+app.get("/", (req, response) => {
+    response.send("api is working fine")
 })
 
 const io = new Server(server, {
     cors: {
-        origin: ["http://localhost:5173", "https://manitv.vercel.app", "https://manitv.live"], 
+        origin: ["http://localhost:5173", "https://manitv.vercel.app", "https://manitv.live"],
         methods: ["GET", "POST"],
     },
 });
@@ -61,6 +61,16 @@ io.on("connection", (socket) => {
         const { candidate, to } = data;
         io.to(to).emit("ice-candidate", { candidate, from: socket.id });
     });
+
+    socket.on("chat-message", ({ roomId, message }) => {
+        console.log(`Received message in server:`, message, "for room:", roomId);
+        if (!roomId) {
+            console.error("No roomId provided, message ignored.");
+            return;
+        }
+        io.to(roomId).emit("chat-message", { roomId, message });
+    });
+
 
     // Handle user disconnection
     socket.on("disconnect", () => {
