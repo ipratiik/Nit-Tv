@@ -1,8 +1,9 @@
 .room-container {
     text-align: center;
     /* padding: 10px 2px; */
-    background-color: #fff3f9;
-    min-height: 100vh;
+    background-color: #fdffde;
+    box-shadow: 1px 1px 100px #feeb1a ;
+    min-height: 70vh;
     display: flex;
     flex-direction: column;
 }
@@ -91,7 +92,7 @@ p {
 }
 
 .chat-box {
-    height: 100px;
+    height: 140px;
     overflow-y: auto;
     padding: 10px;
     border-radius: 8px;

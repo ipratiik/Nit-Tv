@@ -4,6 +4,8 @@ import PeerService from "../service/peer"; // Import the PeerService class
 import "./Room.css"; // Import styles
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 const Room = () => {
     const socket = useSocket(); // Get the socket instance
@@ -19,6 +21,22 @@ const Room = () => {
     const [messageArray, setMessageArray] = useState([]);
     const [mySocketID, setMySocketId] = useState("");
     const [otherUserID, setOtherUserID] = useState("");
+
+    const [user, setUser] = useState(null);
+    const navigate = useNavigate();
+    const auth = getAuth();
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (loggedInUser) => {
+            if (!loggedInUser) {
+                navigate("/"); // Redirect to home if not logged in
+            } else {
+                setUser(loggedInUser);
+            }
+        });
+
+        return () => unsubscribe(); // Cleanup on unmount
+    }, [auth, navigate]);
 
     useEffect(() => {
         const initLocalStream = async () => {
@@ -302,12 +320,20 @@ const Room = () => {
     };
 
     const sendMessage = () => {
+        setMessage("")
         if (!roomId) {
-            toast.success("Cannot send message before other user arrival");
+            toast.error("Chat starts when another user joins.");
             return;
         }
         console.log("Sending message: ", message, "to room:", roomId);
         socket.emit("chat-message", { roomId, message, mySocketID });
+    };
+
+    const handleKeyPress = (event) => {
+        if (event.key === "Enter") {
+            sendMessage();
+            event.target.value = "";
+        }
     };
 
     return (
@@ -370,7 +396,7 @@ const Room = () => {
                         </div>
                     </div>
                     <div className="chat-input">
-                        <input onChange={(e) => { setMessage(e.target.value) }} type="text" placeholder="Type a message..." />
+                        <input onChange={(e) => { setMessage(e.target.value) }} type="text" placeholder="Type a message..." onKeyDown={handleKeyPress} value={message} />
                         <button onClick={sendMessage} >Send</button>
                     </div>
                 </div>
