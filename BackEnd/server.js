@@ -3,17 +3,17 @@ const { Server } = require("socket.io");
 
 const app = express();
 
-const server = app.listen( 8000, () => {
-    console.log(`Server running on port 8000}`);
+const server = app.listen(8000, () => {
+    console.log(`Server running on port 8000`);
 });
 
-app.get("/", (req, response) =>{
-    response.send("api is working fine")    
+app.get("/", (req, response) => {
+    response.send("api is working fine")
 })
 
 const io = new Server(server, {
     cors: {
-        origin: ["http://localhost:5173", "https://manitv.vercel.app", "https://manitv.live"], 
+        origin: ["http://localhost:5173", "https://manitv.vercel.app", "https://manitv.live"],
         methods: ["GET", "POST"],
     },
 });
@@ -62,6 +62,12 @@ io.on("connection", (socket) => {
         io.to(to).emit("ice-candidate", { candidate, from: socket.id });
     });
 
+    socket.on("chat-message", ({ roomId, message, mySocketID }) => {
+        console.log(`Received message in server:`, message, "for room:", roomId);
+        io.emit("chat-message", { roomId, message, mySocketId : mySocketID });
+    });
+
+
     // Handle user disconnection
     socket.on("disconnect", () => {
         availableUsers = availableUsers.filter((id) => id !== socket.id);
@@ -104,7 +110,7 @@ function leaveRoom(socket, roomId) {
     if (roomId && rooms.has(roomId)) {
         const users = rooms.get(roomId);
         const otherUserId = users.find((id) => id !== socket.id);
-        if (otherUserId) {
+        if (otherUserId) { 
             io.to(otherUserId).emit("user-left", { roomId });
         }
         socket.leave(roomId);

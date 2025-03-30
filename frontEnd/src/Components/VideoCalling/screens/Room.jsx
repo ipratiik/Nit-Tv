@@ -2,6 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 import { useSocket } from "../context/SocketProvider"; // Import the socket hook
 import PeerService from "../service/peer"; // Import the PeerService class
 import "./Room.css"; // Import styles
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 const Room = () => {
     const socket = useSocket(); // Get the socket instance
@@ -15,6 +19,24 @@ const Room = () => {
     const remoteVideoRef = useRef(null); // Ref for remote video element
     const [message, setMessage] = useState("");
     const [messageArray, setMessageArray] = useState([]);
+    const [mySocketID, setMySocketId] = useState("");
+    const [otherUserID, setOtherUserID] = useState("");
+
+    const [user, setUser] = useState(null);
+    const navigate = useNavigate();
+    const auth = getAuth();
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (loggedInUser) => {
+            if (!loggedInUser) {
+                navigate("/"); // Redirect to home if not logged in
+            } else {
+                setUser(loggedInUser);
+            }
+        });
+
+        return () => unsubscribe(); // Cleanup on unmount
+    }, [auth, navigate]);
 
     useEffect(() => {
         const initLocalStream = async () => {
@@ -69,10 +91,11 @@ const Room = () => {
         if (!socket || !isStarted) return;
 
         // When matched with another user
-        socket.on("join-room", async ({ roomId, from }) => {
+        socket.on("join-room", async ({ roomId, from, me }) => {
             console.log(`Joined room ${roomId} with user ${from}`);
             setRoomId(roomId);
             setWaiting(false);
+            setMySocketId(from)
             peerInstance.current = new PeerService(); // Create a new PeerService instance
 
             // Add local stream to the peer connection
@@ -238,6 +261,11 @@ const Room = () => {
             setWaiting(true);
         });
 
+        socket.on("chat-message", ({ roomId, message, mySocketId }) => {
+            console.log(message, " and ", roomId);
+            setMessageArray((e) => [...e, { message, mySocketId }]);
+        });
+
         // Cleanup socket listeners on unmount
         return () => {
             socket.off("join-room");
@@ -246,8 +274,14 @@ const Room = () => {
             socket.off("ice-candidate");
             socket.off("user-left");
             socket.off("waiting");
+            socket.off("chat-message");
         };
     }, [socket, isStarted, localStream]);
+
+
+    useEffect(() => {
+        console.log("array of messgae :: ", messageArray);
+    }, [messageArray])
 
     // Handle "Start" button click
     const handleStart = () => {
@@ -285,12 +319,26 @@ const Room = () => {
         socket.emit("stop", roomId);
     };
 
-    const sendMessage = () =>{
-        if(!roomId) return;
-        console.log(message);
-    }
+    const sendMessage = () => {
+        setMessage("")
+        if (!roomId) {
+            toast.error("Chat starts when another user joins.");
+            return;
+        }
+        console.log("Sending message: ", message, "to room:", roomId);
+        socket.emit("chat-message", { roomId, message, mySocketID });
+    };
+
+    const handleKeyPress = (event) => {
+        if (event.key === "Enter") {
+            sendMessage();
+            event.target.value = "";
+        }
+    };
+
     return (
         <div className="room-container">
+            <ToastContainer />
             <div className="video-container">
                 {/* Local Video Window */}
                 <div className="video-box local-video">
@@ -333,11 +381,22 @@ const Room = () => {
                 <div className="chat-container">
                     <div className="chat-box">
                         <div className="messages">
-                            {/* Messages will be displayed here */}
+                            {
+                                messageArray.map(({ message, mySocketId }, index) => (
+                                    mySocketID === mySocketId ?
+                                        <div key={index} style={{ color: "black" }}>
+                                            You : {message}
+                                        </div>
+                                        :
+                                        <div key={index} style={{ color: "black" }}>
+                                            Other : {message}
+                                        </div>
+                                ))
+                            }
                         </div>
                     </div>
                     <div className="chat-input">
-                        <input onChange={(e)=> {setMessage(e.current.value)}} type="text" placeholder="Type a message..." />
+                        <input onChange={(e) => { setMessage(e.target.value) }} type="text" placeholder="Type a message..." onKeyDown={handleKeyPress} value={message} />
                         <button onClick={sendMessage} >Send</button>
                     </div>
                 </div>
