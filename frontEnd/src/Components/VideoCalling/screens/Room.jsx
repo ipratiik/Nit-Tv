@@ -1,43 +1,20 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useSocket } from "../context/SocketProvider"; 
-import PeerService from "../service/peer"; 
-import "./Room.css"; 
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from "react-router-dom";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { useSocket } from "../context/SocketProvider"; // Import the socket hook
+import PeerService from "../service/peer"; // Import the PeerService class
+import "./Room.css"; // Import styles
 
 const Room = () => {
-    // todo :: intall better comments to see the comments with colous
-    const socket = useSocket();
+    const socket = useSocket(); // Get the socket instance
     const [localStream, setLocalStream] = useState(null); // Local video stream
     const [remoteStream, setRemoteStream] = useState(null); // Remote video stream
-    const [roomId, setRoomId] = useState(null); 
-    const [isStarted, setIsStarted] = useState(false);
-    const [waiting, setWaiting] = useState(false); 
-    const peerInstance = useRef(null); 
-    const localVideoRef = useRef(null);  
-    const remoteVideoRef = useRef(null);  
+    const [roomId, setRoomId] = useState(null); // Current room ID
+    const [isStarted, setIsStarted] = useState(false); // Whether the user has clicked "Start"
+    const [waiting, setWaiting] = useState(false); // Waiting for another user
+    const peerInstance = useRef(null); // Store the PeerService instance
+    const localVideoRef = useRef(null); // Ref for local video element
+    const remoteVideoRef = useRef(null); // Ref for remote video element
     const [message, setMessage] = useState("");
     const [messageArray, setMessageArray] = useState([]);
-    const [mySocketID, setMySocketId] = useState("");
-    // const [otherUserID, setOtherUserID] = useState("");
-
-    const [user, setUser] = useState(null);
-    const navigate = useNavigate();
-    const auth = getAuth();
-
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (loggedInUser) => {
-            if (!loggedInUser) {
-                navigate("/"); 
-            } else {
-                setUser(loggedInUser);
-            }
-        });
-
-        return () => unsubscribe(); 
-    }, [auth, navigate]);
 
     useEffect(() => {
         const initLocalStream = async () => {
@@ -50,6 +27,11 @@ const Room = () => {
                 setLocalStream(stream);
             } catch (error) {
                 console.error("Error accessing media devices:", error.name, error.message);
+                if (error.name === "NotAllowedError") {
+                    console.warn("Permissions denied for camera/microphone.");
+                } else if (error.name === "NotFoundError") {
+                    console.warn("No camera/microphone found.");
+                }
             }
         };
         initLocalStream();
@@ -65,16 +47,16 @@ const Room = () => {
 
     useEffect(() => {
         if (localStream && localVideoRef.current) {
+            console.log("Just added Assigning local stream to video element");
             localVideoRef.current.srcObject = localStream;
-        } 
-        else {
+        } else {
             console.log("Just added Local stream or video ref is missing");
         }
     }, [localStream]);
 
 
 
-    // todo :: Set the remote stream on the video element when the stream or ref changes
+    // Set the remote stream on the video element when the stream or ref changes
     useEffect(() => {
         if (remoteStream && remoteVideoRef.current) {
             remoteVideoRef.current.srcObject = remoteStream;
@@ -82,29 +64,31 @@ const Room = () => {
         }
     }, [remoteStream, remoteVideoRef]);
 
+    // Handle socket events
     useEffect(() => {
         if (!socket || !isStarted) return;
 
-        socket.on("join-room", async ({ roomId, from, me }) => {
+        // When matched with another user
+        socket.on("join-room", async ({ roomId, from }) => {
             console.log(`Joined room ${roomId} with user ${from}`);
             setRoomId(roomId);
             setWaiting(false);
-            setMySocketId(from)
-            peerInstance.current = new PeerService(); 
+            peerInstance.current = new PeerService(); // Create a new PeerService instance
 
+            // Add local stream to the peer connection
             localStream.getTracks().forEach((track) =>
                 peerInstance.current.webRTCPeer.addTrack(track, localStream)
             );
             console.log("Local stream tracks added to peer connection");
 
-            // todo :: listen for remote stream
+            // Listen for remote stream
             peerInstance.current.webRTCPeer.ontrack = (event) => {
                 console.log("ontrack event fired");
                 console.log("Received remote stream:", event.streams[0]);
                 setRemoteStream(event.streams[0]);
             };
 
-            // * log connection state changes
+            // Log connection state changes
             peerInstance.current.webRTCPeer.onconnectionstatechange = () => {
                 console.log(
                     "Connection state:",
@@ -112,7 +96,7 @@ const Room = () => {
                 );
             };
 
-            // * log ICE connection state changes
+            // Log ICE connection state changes
             peerInstance.current.webRTCPeer.oniceconnectionstatechange = () => {
                 console.log(
                     "ICE connection state:",
@@ -120,7 +104,7 @@ const Room = () => {
                 );
             };
 
-            //todo :: Handle ICE candidates
+            // Handle ICE candidates
             peerInstance.current.webRTCPeer.onicecandidate = (event) => {
                 if (event.candidate) {
                     console.log("Sending ICE candidate");
@@ -131,7 +115,7 @@ const Room = () => {
                 }
             };
 
-            // todo :: decide which peer creates the offer based on socket IDs
+            // Decide which peer creates the offer based on socket IDs
             if (socket.id < from) {
                 // This peer creates the offer
                 console.log("This peer is the offerer");
@@ -142,12 +126,13 @@ const Room = () => {
             }
         });
 
-        // todo :: receive an offer
+        // Receive an offer
         socket.on("offer", async ({ offer, from, roomId }) => {
             console.log(`Received offer from ${from} in room ${roomId}`);
             setRoomId(roomId);
             setWaiting(false);
 
+            // If we already have a peer instance, don't create a new one
             if (!peerInstance.current) {
                 peerInstance.current = new PeerService();
 
@@ -192,7 +177,7 @@ const Room = () => {
                 };
             }
 
-            // todo :: set the remote offer and create an answer
+            // Set the remote offer and create an answer
             try {
                 await peerInstance.current.setRemoteDescription(offer);
                 const answer = await peerInstance.current.getAnswer(offer);
@@ -202,7 +187,7 @@ const Room = () => {
             }
         });
 
-        // todo :: receive an answer
+        // Receive an answer
         socket.on("answer", async ({ answer }) => {
             console.log("Received answer");
             if (peerInstance.current && peerInstance.current.webRTCPeer.signalingState === "have-local-offer") {
@@ -219,7 +204,7 @@ const Room = () => {
             }
         });
 
-        // todo :: eeceive an ICE candidate
+        // Receive an ICE candidate
         socket.on("ice-candidate", async ({ candidate }) => {
             console.log("Received ICE candidate");
             if (peerInstance.current) {
@@ -233,6 +218,7 @@ const Room = () => {
             }
         });
 
+        // When the other user leaves
         socket.on("user-left", () => {
             console.log("Other user left the room");
             setRemoteStream(null);
@@ -246,16 +232,13 @@ const Room = () => {
             }
         });
 
+        // Waiting for another user
         socket.on("waiting", (message) => {
             console.log(message);
             setWaiting(true);
         });
 
-        socket.on("chat-message", ({ roomId, message, mySocketId }) => {
-            console.log(message, " and ", roomId);
-            setMessageArray((e) => [...e, { message, mySocketId }]);
-        });
-
+        // Cleanup socket listeners on unmount
         return () => {
             socket.off("join-room");
             socket.off("offer");
@@ -263,16 +246,16 @@ const Room = () => {
             socket.off("ice-candidate");
             socket.off("user-left");
             socket.off("waiting");
-            socket.off("chat-message");
         };
     }, [socket, isStarted, localStream]);
 
-
+    // Handle "Start" button click
     const handleStart = () => {
         setIsStarted(true);
         socket.emit("start");
     };
 
+    // Handle "Next" button click
     const handleNext = () => {
         if (peerInstance.current) {
             peerInstance.current.webRTCPeer.close();
@@ -286,6 +269,7 @@ const Room = () => {
         setRoomId(null);
     };
 
+    // Handle "Stop" button click
     const handleStop = () => {
         if (peerInstance.current) {
             peerInstance.current.webRTCPeer.close();
@@ -301,25 +285,14 @@ const Room = () => {
         socket.emit("stop", roomId);
     };
 
-    const sendMessage = () => {
-        setMessage("")
-        if (!roomId) {
-            toast.error("No one to chat at the moment");
-            return;
-        }
-        socket.emit("chat-message", { roomId, message, mySocketID });
-    };
-
-    const handleKeyPress = (event) => {
-        if (event.key === "Enter") {
-            sendMessage();
-        }
-    };
-
+    const sendMessage = () =>{
+        if(!roomId) return;
+        console.log(message);
+    }
     return (
         <div className="room-container">
-            <ToastContainer />
             <div className="video-container">
+                {/* Local Video Window */}
                 <div className="video-box local-video">
                     {localStream ? (
                         <video ref={localVideoRef} autoPlay muted playsInline />
@@ -328,6 +301,7 @@ const Room = () => {
                     )}
                 </div>
 
+                {/* Remote Video Window */}
                 <div className="video-box remote-video">
                     {remoteStream ? (
                         <video ref={remoteVideoRef} autoPlay playsInline />
@@ -359,25 +333,16 @@ const Room = () => {
                 <div className="chat-container">
                     <div className="chat-box">
                         <div className="messages">
-                            {
-                                messageArray.map(({ message, mySocketId }, index) => (
-                                    mySocketID === mySocketId ?
-                                        <div key={index} style={{ color: "black" }}>
-                                            You : {message}
-                                        </div>
-                                        :
-                                        <div key={index} style={{ color: "black" }}>
-                                            Other : {message}
-                                        </div>
-                                ))
-                            }
+                            {/* Messages will be displayed here */}
                         </div>
                     </div>
                     <div className="chat-input">
-                        <input onChange={(e) => { setMessage(e.target.value) }} type="text" placeholder="Type a message..." onKeyDown={handleKeyPress} value={message} />
+                        <input onChange={(e)=> {setMessage(e.current.value)}} type="text" placeholder="Type a message..." />
                         <button onClick={sendMessage} >Send</button>
                     </div>
                 </div>
+
+
             </section>
         </div>
     );
