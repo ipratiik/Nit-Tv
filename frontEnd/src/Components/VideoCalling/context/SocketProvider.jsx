@@ -15,10 +15,12 @@ export default function SocketProvider(props) {
         () =>
             // io("http://localhost:8000", {
             io("wss://manittv-production.up.railway.app/", {
-                transports: ["websocket"], // Force WebSocket transport to avoid polling issues
+                transports: ["websocket", "polling"], // Force WebSocket transport to avoid polling issues
                 reconnection: true, // Enable reconnection
                 reconnectionAttempts: 5, // Number of reconnection attempts
                 reconnectionDelay: 1000, // Delay between reconnection attempts (1 second)
+                secure: true, // Explicitly mark it as a secure WebSocket connection
+                // todo :: this prevents the web Socket connection to fail 
             }),
         []
     );

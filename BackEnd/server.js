@@ -15,35 +15,35 @@ const io = new Server(server, {
     cors: {
         origin: ["http://localhost:5173", "https://manitv.vercel.app", "https://manitv.live"],
         methods: ["GET", "POST"],
+        allowedHeaders: ["Access-Control-Allow-Origin"],
+        credentials: true
     },
 });
 
-// Store users who are available to chat (after clicking "Start")
+
 let availableUsers = [];
-// Store active rooms (key: roomId, value: array of user socket IDs)
+// todo :: store active rooms, key: roomId, value: array of user socket IDs
 const rooms = new Map();
 
 io.on("connection", (socket) => {
     console.log(`User connected: ${socket.id}`);
 
-    // When a user clicks "Start", add them to the available users pool
+    // When a user clicks "start" button in the frontEnd this is activated
     socket.on("start", () => {
         availableUsers.push(socket.id);
-        console.log(`User ${socket.id} is available to chat`);
         matchUsers(socket);
     });
 
-    // When a user clicks "Next", find a new match
+    // when a user clicks "Next" button
     socket.on("next", (currentRoomId) => {
         leaveRoom(socket, currentRoomId);
         matchUsers(socket);
     });
 
-    // When a user clicks "Stop", remove them from their room and the available pool
+    // when a user clicks "Stop", remove them from their room and the available pool as well
     socket.on("stop", (roomId) => {
         leaveRoom(socket, roomId);
         availableUsers = availableUsers.filter((id) => id !== socket.id);
-        console.log(`User ${socket.id} stopped the stream`);
     });
 
     // Handle WebRTC signaling
@@ -64,11 +64,9 @@ io.on("connection", (socket) => {
 
     socket.on("chat-message", ({ roomId, message, mySocketID }) => {
         console.log(`Received message in server:`, message, "for room:", roomId);
-        io.emit("chat-message", { roomId, message, mySocketId : mySocketID });
+        io.emit("chat-message", { roomId, message, mySocketId: mySocketID });
     });
 
-
-    // Handle user disconnection
     socket.on("disconnect", () => {
         availableUsers = availableUsers.filter((id) => id !== socket.id);
         for (const [roomId, users] of rooms.entries()) {
@@ -77,40 +75,34 @@ io.on("connection", (socket) => {
                 break;
             }
         }
-        console.log(`User disconnected: ${socket.id}`);
     });
 });
 
-// Function to match users
 function matchUsers(socket) {
-    // Remove the current user from the available pool
     availableUsers = availableUsers.filter((id) => id !== socket.id);
-
-    // Find another available user to pair with
     if (availableUsers.length > 0) {
-        const otherUserId = availableUsers.shift(); // Take the first available user
-        const roomId = `${socket.id}-${otherUserId}`; // Create a unique room ID
+        const otherUserId = availableUsers.shift(); // todo :: take the first available user
+        const roomId = `${socket.id}-${otherUserId}`;
 
-        // Add both users to the room
+        // todo :: adding both users to the room
         rooms.set(roomId, [socket.id, otherUserId]);
         socket.join(roomId);
         io.to(otherUserId).emit("join-room", { roomId, from: socket.id });
         socket.emit("join-room", { roomId, from: otherUserId });
-
         console.log(`Matched ${socket.id} with ${otherUserId} in room ${roomId}`);
-    } else {
-        // No other users available, add this user back to the pool
+
+    }
+    else {
         availableUsers.push(socket.id);
         socket.emit("waiting", "Waiting for another user...");
     }
 }
 
-// Function to handle leaving a room
 function leaveRoom(socket, roomId) {
     if (roomId && rooms.has(roomId)) {
         const users = rooms.get(roomId);
         const otherUserId = users.find((id) => id !== socket.id);
-        if (otherUserId) { 
+        if (otherUserId) {
             io.to(otherUserId).emit("user-left", { roomId });
         }
         socket.leave(roomId);
