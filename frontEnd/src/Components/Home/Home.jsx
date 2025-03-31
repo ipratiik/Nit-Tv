@@ -57,15 +57,15 @@ export default function Home() {
       const email = result.user.email;
 
       // 🔹 Restrict login to MANIT/NIT students
-      if (
-        !email.endsWith('@stu.manit.ac.in') &&
-        !email.endsWith('@nit.ac.in')
-      ) {
-        setError('Only NIT students can log in.');
-        await signOut(auth); // Log out unauthorized users
-        toast.error('Login Failed! Try Again!');
-        return;
-      }
+      // if (
+      //   !email.endsWith('@stu.manit.ac.in') &&
+      //   !email.endsWith('@nit.ac.in')
+      // ) {
+      //   setError('Only NIT students can log in.');
+      //   await signOut(auth); // Log out unauthorized users
+      //   toast.error('Login Failed! Try Again!');
+      //   return;
+      // }
 
       setUser(result.user);
       setError(''); // Clear any previous errors
