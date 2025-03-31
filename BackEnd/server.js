@@ -23,9 +23,11 @@ let availableUsers = [];
 // Store active rooms (key: roomId, value: array of user socket IDs)
 const rooms = new Map();
 
+let activeUsers=0;
+
 io.on("connection", (socket) => {
     console.log(`User connected: ${socket.id}`);
-
+    activeUsers++;
     // When a user clicks "Start", add them to the available users pool
     socket.on("start", () => {
         availableUsers.push(socket.id);
@@ -33,16 +35,22 @@ io.on("connection", (socket) => {
         matchUsers(socket);
     });
 
+    setInterval(() => {
+        const numberOfUsers = availableUsers.length + 2*rooms.size;
+        io.emit("active-users", numberOfUsers); // Emit to all connected clients
+    }, 10000);
+
+
     // When a user clicks "Next", find a new match
-    socket.on("next", ({roomId : currentRoomId, otherUserID}) => {
+    socket.on("next", ({ roomId: currentRoomId, otherUserID }) => {
         leaveRoom(socket, currentRoomId);
         matchUsers(socket);
         io.to(otherUserID).emit("clear-Messages");
-        
+
     });
 
     // When a user clicks "Stop", remove them from their room and the available pool
-    socket.on("stop", ({roomId, otherUserID}) => {
+    socket.on("stop", ({ roomId, otherUserID }) => {
         leaveRoom(socket, roomId);
         availableUsers = availableUsers.filter((id) => id !== socket.id);
         io.to(otherUserID).emit("clear-Messages");
@@ -65,14 +73,14 @@ io.on("connection", (socket) => {
         io.to(to).emit("ice-candidate", { candidate, from: socket.id });
     });
 
-    socket.on("chat-message", ({ roomId, message, mySocketID, otherUserID : otherUserId }) => {
-        console.log(`Received message in server:`, message, "for room:", roomId,  "users :: " , mySocketID, " !!", otherUserId);
+    socket.on("chat-message", ({ roomId, message, mySocketID, otherUserID: otherUserId }) => {
+        console.log(`Received message in server:`, message, "for room:", roomId, "users :: ", mySocketID, " !!", otherUserId);
         io.to(otherUserId).emit("chat-message", { roomId, message, mySocketID });
     });
 
 
     // Handle user disconnection
-    socket.on("disconnect", () => { 
+    socket.on("disconnect", () => {
         availableUsers = availableUsers.filter((id) => id !== socket.id);
         for (const [roomId, users] of rooms.entries()) {
             if (users.includes(socket.id)) {
@@ -97,8 +105,8 @@ function matchUsers(socket) {
         // Add both users to the room
         rooms.set(roomId, [socket.id, otherUserId]);
         socket.join(roomId);
-        io.to(otherUserId).emit("join-room", { roomId, from: socket.id, me : otherUserId });
-        socket.emit("join-room", { roomId, from: otherUserId, me : socket.id });
+        io.to(otherUserId).emit("join-room", { roomId, from: socket.id, me: otherUserId });
+        socket.emit("join-room", { roomId, from: otherUserId, me: socket.id });
 
         console.log(`Matched ${socket.id} with ${otherUserId} in room ${roomId}`);
     } else {

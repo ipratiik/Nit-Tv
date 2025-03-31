@@ -15,7 +15,6 @@ import {
 import { LogIn, LogOut } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
 
-// 🔹 Firebase Configuration
 const firebaseConfig = {
   apiKey: 'AIzaSyBvGzs4QwqRuH7oO-LGuv2NnQEf3mkBWKQ',
   authDomain: 'inbound-ranger-375215.firebaseapp.com',
@@ -26,19 +25,19 @@ const firebaseConfig = {
   measurementId: 'G-LKLV799DLQ',
 };
 
-// 🔹 Initialize Firebase
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-// 🔹 Ensure session persistence
+// Ensure session persistence
 setPersistence(auth, browserLocalPersistence).catch(console.error);
 
 export default function Home() {
   const [user, setUser] = useState(null);
   const [error, setError] = useState('');
 
-  // 🔹 Keep user logged in even after refresh
+  //  Keep user logged in even after refresh
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (loggedInUser) => {
       if (loggedInUser) {
@@ -56,7 +55,7 @@ export default function Home() {
       const result = await signInWithPopup(auth, provider);
       const email = result.user.email;
 
-      // 🔹 Restrict login to MANIT/NIT students
+      // Restrict login to NIT students
       // if (
       //   !email.endsWith('@stu.manit.ac.in') &&
       //   !email.endsWith('@nit.ac.in')

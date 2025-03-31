@@ -33,6 +33,7 @@ const Room = () => {
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [videoEnabled, setVideoEnabled] = useState(true);
   const chatContainerRef = useRef(null);
+  const [activeUser, setActiveUser] = useState(3);
 
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
@@ -324,6 +325,12 @@ const Room = () => {
       setMessageArray((e) => [...e, { message, mySocketId }]);
     });
 
+    // active users
+    socket.on("active-users", (numberOfUsers) => {
+      setActiveUser(numberOfUsers);
+      // console.log("active user :: ", numberOfUsers);
+    });
+
     // Cleanup socket listeners on unmount
     return () => {
       socket.off("join-room");
@@ -431,6 +438,10 @@ const Room = () => {
         backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20' fill='none' stroke-width='2' stroke='%23E0E0E0'%3e%3cpath d='M0 .5H19.5V20'/%3e%3c/svg%3e")`,
       }}
     >
+      <div class="fixed top-2 right-2 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50">
+        Active Users: <span id="activeUsers">{activeUser}</span>
+      </div>
+
       <Toaster
         position="bottom-center"
         reverseOrder={false}
@@ -456,17 +467,15 @@ const Room = () => {
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 z-10">
                   <button
                     onClick={toggleAudio}
-                    className={`rounded-full p-2 ${
-                      audioEnabled ? "bg-green-500" : "bg-red-500"
-                    } text-white`}
+                    className={`rounded-full p-2 ${audioEnabled ? "bg-green-500" : "bg-red-500"
+                      } text-white`}
                   >
                     {audioEnabled ? <Mic size={20} /> : <MicOff size={20} />}
                   </button>
                   <button
                     onClick={toggleVideo}
-                    className={`rounded-full p-2 ${
-                      videoEnabled ? "bg-green-500" : "bg-red-500"
-                    } text-white`}
+                    className={`rounded-full p-2 ${videoEnabled ? "bg-green-500" : "bg-red-500"
+                      } text-white`}
                   >
                     {videoEnabled ? (
                       <Video size={20} />
