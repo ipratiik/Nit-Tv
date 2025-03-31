@@ -595,7 +595,7 @@ const Room = () => {
           {/* Chat Messages */}
           <div
             ref={chatContainerRef}
-            className="h-44 max-h-44 md:h-72 md:max-h-72 overflow-y-auto rounded-lg border-2 border-gray-400 bg-gray-100 p-4 shadow-xl"
+            className="h-44 max-h-44 overflow-y-auto rounded-lg border-2 border-gray-400 bg-gray-100 p-4 shadow-xl"
           >
             <div className="flex flex-col gap-2">
               {messageArray.length === 0 && (
@@ -606,17 +606,21 @@ const Room = () => {
               {messageArray.map(({ message, mySocketId }, index) =>
                 mySocketID === mySocketId ? (
                   <div key={index} className="flex flex-col items-end">
-                    <div className="max-w-3/4 rounded-lg rounded-tr-none bg-emerald-100 px-3 py-2">
-                      <p className="text-black text-sm">{message}</p>
+                    <div className="max-w-3/4 rounded-2xl rounded-br-none bg-gradient-to-r from-teal-400 to-emerald-500 px-4 py-3 shadow-md">
+                      <p className="text-white text-sm">{message}</p>
                     </div>
-                    <span className="text-xs text-emerald-600 mt-1">You</span>
+                    <span className="text-xs text-emerald-600 mt-1 pr-2">
+                      You
+                    </span>
                   </div>
                 ) : (
                   <div key={index} className="flex flex-col items-start">
-                    <div className="max-w-3/4 rounded-lg rounded-tl-none bg-amber-100 px-3 py-2">
-                      <p className="text-black text-sm">{message}</p>
+                    <div className="max-w-3/4 rounded-2xl rounded-bl-none bg-gradient-to-r from-amber-300 to-orange-300 px-4 py-3 shadow-md">
+                      <p className="text-gray-800 text-sm">{message}</p>
                     </div>
-                    <span className="text-xs text-amber-600 mt-1">Other</span>
+                    <span className="text-xs text-amber-600 mt-1 pl-2">
+                      Other
+                    </span>
                   </div>
                 )
               )}
