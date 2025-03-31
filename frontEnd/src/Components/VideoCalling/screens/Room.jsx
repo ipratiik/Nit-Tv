@@ -435,7 +435,7 @@ const Room = () => {
         backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20' fill='none' stroke-width='2' stroke='%23E0E0E0'%3e%3cpath d='M0 .5H19.5V20'/%3e%3c/svg%3e")`,
       }}
     >
-      <div className="fixed top-2 right-2 inline-flex w-fit items-center gap-2 rounded-lg border border-emerald-500 bg-emerald-200 px-3 py-1.5">
+      <div className="fixed top-2 right-2 inline-flex w-fit items-center gap-2 z-10 rounded-lg border border-emerald-500 bg-emerald-200 px-3 py-1.5">
         <div className="relative size-2.5 rounded-full bg-green-500">
           <span className="ping-large absolute inset-0 rounded-full bg-red-600" />
         </div>
