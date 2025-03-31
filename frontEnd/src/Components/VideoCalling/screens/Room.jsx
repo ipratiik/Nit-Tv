@@ -435,6 +435,13 @@ const Room = () => {
         backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20' fill='none' stroke-width='2' stroke='%23E0E0E0'%3e%3cpath d='M0 .5H19.5V20'/%3e%3c/svg%3e")`,
       }}
     >
+      <div className="fixed top-2 right-2 inline-flex w-fit items-center gap-2 rounded-lg border border-emerald-500 bg-emerald-200 px-3 py-1.5">
+        <div className="relative size-2.5 rounded-full bg-green-500">
+          <span className="ping-large absolute inset-0 rounded-full bg-red-600" />
+        </div>
+        <p className="text-xs font-bold text-black">{activeUser} Online</p>
+      </div>
+
       <Toaster
         position="bottom-center"
         reverseOrder={false}
@@ -445,7 +452,7 @@ const Room = () => {
       <div className="container mx-auto px-4 py-6 md:py-8">
         <div className="grid gap-4 md:gap-6 lg:grid-cols-2 xl:gap-8">
           {/* Local Video Window */}
-          <div className="relative flex items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-gray-300 bg-gray-100 object-contain shadow-xl md:shadow-2xl h-56 md:h-64 lg:h-80 xl:h-96">
+          <div className="relative flex items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-gray-300 bg-gray-100 object-contain shadow-xl md:shadow-2xl h-72 md:h-64 lg:h-80 xl:h-96">
             {localStream ? (
               <Fragment>
                 <video
@@ -491,7 +498,7 @@ const Room = () => {
           </div>
 
           {/* Remote Video Window */}
-          <div className="flex items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-gray-300 bg-gray-100 object-contain shadow-xl md:shadow-2xl h-56 md:h-64 lg:h-80 xl:h-96">
+          <div className="flex items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-gray-300 bg-gray-100 object-contain shadow-xl md:shadow-2xl h-72 md:h-64 lg:h-80 xl:h-96">
             {remoteStream ? (
               <video
                 ref={remoteVideoRef}
@@ -565,16 +572,6 @@ const Room = () => {
                   </button>
                 </div>
               )}
-            </div>
-            <div className="flex justify-center">
-              <div className="inline-flex w-fit items-center gap-2 rounded-lg border border-emerald-500 bg-emerald-200 px-3 py-1.5">
-                <div className="relative size-2.5 rounded-full bg-green-500">
-                  <span className="ping-large absolute inset-0 rounded-full bg-green-600" />
-                </div>
-                <p className="text-xs font-bold text-black">
-                  {activeUser} Online
-                </p>
-              </div>
             </div>
 
             {/* Chat Input */}
