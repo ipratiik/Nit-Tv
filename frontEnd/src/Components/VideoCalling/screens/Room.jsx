@@ -520,12 +520,14 @@ const Room = () => {
           <div className="flex flex-col gap-1">
             {messageArray.map(({ message, mySocketId }, index) =>
               mySocketID === mySocketId ? (
-                <div key={index} className="z-10 text-right text-emerald-600">
-                  <b>You:</b> <p>{message}</p>
+                <div key={index} className="z-10 text-right">
+                  <b className="text-emerald-600">You:</b>&nbsp;
+                  <p className="text-black">{message}</p>
                 </div>
               ) : (
-                <div key={index} className="z-10 text-left text-amber-500">
-                  <b>Other:</b> <p>{message}</p>
+                <div key={index} className="z-10 text-left">
+                  <b className="text-amber-500">Other:</b>&nbsp;
+                  <p className="text-black">{message}</p>
                 </div>
               ),
             )}
