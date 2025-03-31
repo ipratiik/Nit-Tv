@@ -211,7 +211,6 @@ const Room = () => {
         peerInstance.current.webRTCPeer.ontrack = (event) => {
           console.log("Received remote stream:", event.streams[0]);
           setRemoteStream(event.streams[0]);
-          toast.success("Connected.");
         };
 
         // Log connection state changes
@@ -436,10 +435,6 @@ const Room = () => {
         backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20' fill='none' stroke-width='2' stroke='%23E0E0E0'%3e%3cpath d='M0 .5H19.5V20'/%3e%3c/svg%3e")`,
       }}
     >
-      <div class="fixed top-2 right-2 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50">
-        Active Users: <span id="activeUsers">{activeUser}</span>
-      </div>
-
       <Toaster
         position="bottom-center"
         reverseOrder={false}
@@ -534,7 +529,7 @@ const Room = () => {
       {/* Actions and Chat Section */}
       <div className="container mx-auto px-4 pb-8">
         <div className="grid gap-4 md:gap-6 lg:grid-cols-2 xl:gap-8">
-          <div className="flex flex-col justify-around">
+          <div className="flex flex-col justify-evenly">
             <div className="justify-center gap-4 flex mb-4">
               {!isStarted ? (
                 <button
@@ -571,6 +566,16 @@ const Room = () => {
                 </div>
               )}
             </div>
+            <div className="flex justify-center">
+              <div className="inline-flex w-fit items-center gap-2 rounded-lg border border-emerald-500 bg-emerald-200 px-3 py-1.5">
+                <div className="relative size-2.5 rounded-full bg-green-500">
+                  <span className="ping-large absolute inset-0 rounded-full bg-green-600" />
+                </div>
+                <p className="text-xs font-bold text-black">
+                  {activeUser} Online
+                </p>
+              </div>
+            </div>
 
             {/* Chat Input */}
             <div className="flex items-center gap-2 md:gap-4 mt-4">
@@ -594,7 +599,7 @@ const Room = () => {
           {/* Chat Messages */}
           <div
             ref={chatContainerRef}
-            className="h-44 max-h-44 overflow-y-auto rounded-lg border-2 border-gray-400 bg-gray-100 p-4 shadow-xl"
+            className="h-44 max-h-44 md:h-72 md:max-h-72 overflow-y-auto rounded-lg border-2 border-gray-400 bg-gray-100 p-4 shadow-xl"
           >
             <div className="flex flex-col gap-2">
               {messageArray.length === 0 && (
@@ -606,14 +611,14 @@ const Room = () => {
                 mySocketID === mySocketId ? (
                   <div key={index} className="flex flex-col items-end">
                     <div className="max-w-3/4 rounded-lg rounded-tr-none bg-emerald-100 px-3 py-2">
-                      <p className="text-black">{message}</p>
+                      <p className="text-black text-sm">{message}</p>
                     </div>
                     <span className="text-xs text-emerald-600 mt-1">You</span>
                   </div>
                 ) : (
                   <div key={index} className="flex flex-col items-start">
                     <div className="max-w-3/4 rounded-lg rounded-tl-none bg-amber-100 px-3 py-2">
-                      <p className="text-black">{message}</p>
+                      <p className="text-black text-sm">{message}</p>
                     </div>
                     <span className="text-xs text-amber-600 mt-1">Other</span>
                   </div>
