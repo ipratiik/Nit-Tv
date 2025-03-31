@@ -460,9 +460,8 @@ const Room = () => {
                   autoPlay
                   muted
                   playsInline
-                  className="h-96 min-h-96 max-h-96 w-full object-cover rotate-y-180"
+                  className="h-full w-full object-cover rotate-y-180"
                 />
-
 
                 {/* Media Controls */}
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 z-10">
@@ -503,7 +502,7 @@ const Room = () => {
                 ref={remoteVideoRef}
                 autoPlay
                 playsInline
-                className="h-96 min-h-96 max-h-96 w-full object-cover"
+                className="h-full w-full object-cover"
               />
             ) : (
               <div className="flex items-center justify-center p-4">
