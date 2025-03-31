@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { initializeApp } from "firebase/app";
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { initializeApp } from 'firebase/app';
 import {
   getAuth,
   GoogleAuthProvider,
@@ -10,20 +10,20 @@ import {
   setPersistence,
   browserLocalPersistence,
   updateProfile,
-} from "firebase/auth";
+} from 'firebase/auth';
 
-import { LogIn, LogOut } from "lucide-react";
-import { Toaster, toast } from "react-hot-toast";
+import { LogIn, LogOut } from 'lucide-react';
+import { Toaster, toast } from 'react-hot-toast';
 
 // 🔹 Firebase Configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBvGzs4QwqRuH7oO-LGuv2NnQEf3mkBWKQ",
-  authDomain: "inbound-ranger-375215.firebaseapp.com",
-  projectId: "inbound-ranger-375215",
-  storageBucket: "inbound-ranger-375215.appspot.com",
-  messagingSenderId: "620360233615",
-  appId: "1:620360233615:web:f10161593a6c9a22bf36fa",
-  measurementId: "G-LKLV799DLQ",
+  apiKey: 'AIzaSyBvGzs4QwqRuH7oO-LGuv2NnQEf3mkBWKQ',
+  authDomain: 'inbound-ranger-375215.firebaseapp.com',
+  projectId: 'inbound-ranger-375215',
+  storageBucket: 'inbound-ranger-375215.appspot.com',
+  messagingSenderId: '620360233615',
+  appId: '1:620360233615:web:f10161593a6c9a22bf36fa',
+  measurementId: 'G-LKLV799DLQ',
 };
 
 // 🔹 Initialize Firebase
@@ -36,7 +36,7 @@ setPersistence(auth, browserLocalPersistence).catch(console.error);
 
 export default function Home() {
   const [user, setUser] = useState(null);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   // 🔹 Keep user logged in even after refresh
   useEffect(() => {
@@ -58,34 +58,34 @@ export default function Home() {
 
       // 🔹 Restrict login to MANIT/NIT students
       if (
-        !email.endsWith("@stu.manit.ac.in") &&
-        !email.endsWith("@nit.ac.in")
+        !email.endsWith('@stu.manit.ac.in') &&
+        !email.endsWith('@nit.ac.in')
       ) {
-        setError("Only NIT students can log in.");
+        setError('Only NIT students can log in.');
         await signOut(auth); // Log out unauthorized users
-        toast.error("Login Failed! Try Again!");
+        toast.error('Login Failed! Try Again!');
         return;
       }
 
       setUser(result.user);
-      setError(""); // Clear any previous errors
+      setError(''); // Clear any previous errors
       toast.success(`Welcome, ${result.user.displayName}.`);
     } catch (err) {
-      setError("Login failed. Try again.");
+      setError('Login failed. Try again.');
       console.error(err);
-      toast.error("Login Failed! Try Again!");
+      toast.error('Login Failed! Try Again!');
     }
   };
 
   const handleLogout = async () => {
     await signOut(auth);
     setUser(null);
-    toast.success("Signed Out Successfully!");
+    toast.success('Signed Out Successfully!');
   };
 
   return (
     <div
-      className="-z-20 h-dvh"
+      className="-z-20 min-h-dvh"
       style={{
         backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20' fill='none' stroke-width='2' stroke='%23E0E0E0'%3e%3cpath d='M0 .5H19.5V20'/%3e%3c/svg%3e")`,
       }}
@@ -108,7 +108,7 @@ export default function Home() {
           </Link>
           <button
             className={`${
-              user ? "bg-red-500" : "bg-emerald-600"
+              user ? 'bg-red-500' : 'bg-emerald-600'
             } m-2 inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl px-4 tracking-wide text-white`}
             onClick={user ? handleLogout : handleGoogleLogin}
           >
@@ -173,13 +173,16 @@ export default function Home() {
             </div>
           )}
           {user ? (
-            <div className="z-10 flex max-w-5xl flex-col items-center gap-4 text-3xl font-bold md:text-7xl">
+            <div className="z-10 flex max-w-5xl flex-col items-center gap-4 text-center text-3xl font-bold md:text-7xl">
               <img
-                src={user.photoURL || "/Avatar.png"}
+                src={user.photoURL || '/Avatar.png'}
                 alt="Profile"
                 className="size-36 rounded-3xl border-2"
               />
-              <p>Welcome, {user.displayName}.</p>
+              <p>
+                Welcome,
+                <br /> {user.displayName}.
+              </p>
             </div>
           ) : (
             <p className="z-10 max-w-5xl text-center text-3xl font-bold md:text-7xl">
@@ -202,8 +205,8 @@ export default function Home() {
           </div>
           {!user && (
             <p className="z-10 hidden max-w-5xl text-center text-xs font-medium md:block md:text-base">
-              Whether it’s banter, brainstorming, or just random gossip – NIT TV
-              is your spot!
+              Whether it&apos;s banter, brainstorming, or just random gossip –
+              NIT TV is your spot!
               <br />
               We've got you covered!
             </p>
@@ -213,16 +216,18 @@ export default function Home() {
               Feeling adventurous? Join random NITians in surprise chat rooms
               and make new friends.
               <br />
-              We've got you covered!
+              We&apos;ve got you covered!
             </p>
           )}
-          <button className="z-10 flex cursor-pointer items-center gap-2 rounded-xl border border-emerald-200 bg-gradient-to-b from-emerald-500 via-emerald-600 to-emerald-700 px-4 py-2 font-medium text-white shadow-xl hover:shadow-2xl">
-            {user ? (
+          {user ? (
+            <button className="z-10 flex cursor-pointer items-center gap-2 rounded-xl border border-emerald-200 bg-gradient-to-b from-emerald-500 via-emerald-600 to-emerald-700 px-4 py-2 font-medium text-white shadow-xl hover:shadow-2xl">
               <Link to="/nitExclusive">👋 Join Your Buddies</Link>
-            ) : (
-              <span
+            </button>
+          ) : (
+            <div className="flex flex-col gap-3">
+              <button
+                className="z-10 flex cursor-pointer items-center gap-2 rounded-xl border border-emerald-200 bg-gradient-to-b from-emerald-500 via-emerald-600 to-emerald-700 px-4 py-2 font-medium text-white shadow-xl hover:shadow-2xl"
                 onClick={handleGoogleLogin}
-                className="flex items-center gap-2"
               >
                 <svg
                   viewBox="0 0 512 512"
@@ -243,9 +248,38 @@ export default function Home() {
                 <p className="text-sm tracking-wide text-white">
                   Sign In With Google
                 </p>
-              </span>
-            )}
-          </button>
+              </button>
+              <button
+                className="z-10 flex cursor-pointer items-center gap-2 rounded-xl border border-emerald-200 bg-gradient-to-b from-emerald-500 via-emerald-600 to-emerald-700 px-4 py-2 font-medium text-white shadow-xl hover:shadow-2xl"
+                onClick={handleGoogleLogin}
+              >
+                <svg
+                  fill="#ffffff"
+                  viewBox="0 0 512 512"
+                  xmlns="http://www.w3.org/2000/svg"
+                  stroke="#ffffff"
+                  height={20}
+                  width={20}
+                >
+                  <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                  <g
+                    id="SVGRepo_tracerCarrier"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  ></g>
+                  <g id="SVGRepo_iconCarrier">
+                    <g id="OTP">
+                      <path d="M458.4741,112H265V62.41A31.3815,31.3815,0,0,0,233.5879,31H62.4077A31.3806,31.3806,0,0,0,31,62.41V449.59A31.4379,31.4379,0,0,0,62.4077,481h171.18A31.4388,31.4388,0,0,0,265,449.59V292H458.4771A22.5231,22.5231,0,0,0,481,269.4771V134.5259A22.5257,22.5257,0,0,0,458.4741,112ZM125.5,50.08h45a11.25,11.25,0,0,1,0,22.5h-45a11.25,11.25,0,0,1,0-22.5Zm44.9956,411.7651h-45a11.25,11.25,0,1,1,0-22.5h45a11.25,11.25,0,0,1,0,22.5ZM245.1982,420.25H50.7974V91.75H245.1982V112H125.3149A22.3149,22.3149,0,0,0,103,134.3149V269.6641A22.3357,22.3357,0,0,0,125.3359,292H166v36.1489a11.1221,11.1221,0,0,0,18.9868,7.8643L229,292h16.1982Zm-24.39-210.06a11.3086,11.3086,0,0,1,4.14,15.39,11.198,11.198,0,0,1-15.39,4.14L195.25,221.44V238a11.25,11.25,0,0,1-22.5,0V221.44L158.437,229.72a11.198,11.198,0,0,1-15.39-4.14,11.3164,11.3164,0,0,1,4.14-15.39L161.5,202l-14.313-8.28a11.2689,11.2689,0,0,1,11.25-19.5293L172.75,182.47V166a11.25,11.25,0,0,1,22.5,0v16.47l14.3086-8.2793a11.2689,11.2689,0,0,1,11.25,19.5293L206.5,202Zm108,0a11.3086,11.3086,0,0,1,4.14,15.39,11.198,11.198,0,0,1-15.39,4.14L303.25,221.44V238a11.25,11.25,0,0,1-22.5,0V221.44L266.437,229.72a11.198,11.198,0,0,1-15.39-4.14,11.3164,11.3164,0,0,1,4.14-15.39L269.5,202l-14.313-8.28a11.2689,11.2689,0,0,1,11.25-19.5293L280.75,182.47V166a11.25,11.25,0,0,1,22.5,0v16.47l14.3086-8.2793a11.2689,11.2689,0,0,1,11.25,19.5293L314.5,202Zm108,0a11.3086,11.3086,0,0,1,4.14,15.39,11.198,11.198,0,0,1-15.39,4.14L411.25,221.44V238a11.25,11.25,0,0,1-22.5,0V221.44L374.437,229.72a11.198,11.198,0,0,1-15.39-4.14,11.3164,11.3164,0,0,1,4.14-15.39L377.5,202l-14.313-8.28a11.2689,11.2689,0,0,1,11.25-19.5293L388.75,182.47V166a11.25,11.25,0,0,1,22.5,0v16.47l14.3086-8.2793a11.2689,11.2689,0,0,1,11.25,19.5293L422.5,202Z"></path>{' '}
+                    </g>
+                  </g>
+                </svg>
+
+                <p className="text-sm tracking-wide text-white">
+                  Sign In Using OTP
+                </p>
+              </button>
+            </div>
+          )}
         </main>
       </section>
     </div>
