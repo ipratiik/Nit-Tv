@@ -1,11 +1,16 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useSocket } from "../context/SocketProvider"; // Import the socket hook
-import PeerService from "../service/peer"; // Import the PeerService class
-import "./Room.css"; // Import styles
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from "react-router-dom";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import React, { useState, useEffect, useRef, Fragment } from 'react';
+import { useSocket } from '../context/SocketProvider'; // Import the socket hook
+import PeerService from '../service/peer'; // Import the PeerService class
+import { useNavigate } from 'react-router-dom';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import {
+    CircleArrowRight,
+    CirclePlay,
+    CircleStop,
+    Loader,
+    SendHorizonal,
+} from 'lucide-react';
+import { Toaster, toast } from 'react-hot-toast';
 
 const Room = () => {
     const socket = useSocket(); // Get the socket instance
@@ -79,7 +84,7 @@ const Room = () => {
 
     useEffect(() => {
         if (!localStream || !peerInstance.current) return;
-    
+
         console.log("Adding tracks to peer connection");
         localStream.getTracks().forEach((track) =>
             peerInstance.current.webRTCPeer.addTrack(track, localStream)
@@ -96,11 +101,11 @@ const Room = () => {
                 console.error("Error accessing media devices:", error);
             }
         };
-    
+
         if (!localStream) getMediaStream();
     }, []);
-    
-    
+
+
 
 
 
@@ -123,7 +128,7 @@ const Room = () => {
             setWaiting(false);
             setMySocketId(me)
             setOtherUserID(from);
-            console.log(from ,  " !and! ", me);
+            console.log(from, " !and! ", me);
             peerInstance.current = new PeerService(); // Create a new PeerService instance
 
             // Add local stream to the peer connection
@@ -290,12 +295,12 @@ const Room = () => {
         });
 
         // clear messages when we clcik stop or next
-        socket.on("clear-Messages", ()=>{
+        socket.on("clear-Messages", () => {
             setMessageArray([]);
         })
 
-        socket.on("chat-message", ({ roomId, message, mySocketID : mySocketId }) => {
-            console.log("message was delivered :: " , mySocketID )
+        socket.on("chat-message", ({ roomId, message, mySocketID: mySocketId }) => {
+            console.log("message was delivered :: ", mySocketID)
             setMessageArray((e) => [...e, { message, mySocketId }]);
         });
 
@@ -333,7 +338,7 @@ const Room = () => {
             remoteVideoRef.current.srcObject = null;
         }
         setMessageArray([]);
-        socket.emit("next", {roomId, otherUserID});
+        socket.emit("next", { roomId, otherUserID });
         setRoomId(null);
     };
 
@@ -350,7 +355,7 @@ const Room = () => {
         if (remoteVideoRef.current) {
             remoteVideoRef.current.srcObject = null;
         }
-        socket.emit("stop", {roomId, otherUserID});
+        socket.emit("stop", { roomId, otherUserID });
     };
 
     const sendMessage = () => {
@@ -359,10 +364,10 @@ const Room = () => {
             toast.error("Chat starts when another user joins.");
             return;
         }
-        setMessageArray((e) => [...e, {message, mySocketId : mySocketID}]);
+        setMessageArray((e) => [...e, { message, mySocketId: mySocketID }]);
         console.log("Sending message: ", message, "to room:", roomId);
-        console.log("userse for chat are :: " , mySocketID, " !!",  otherUserID)
-        socket.emit("chat-message", { roomId, message, mySocketID , otherUserID});
+        console.log("userse for chat are :: ", mySocketID, " !!", otherUserID)
+        socket.emit("chat-message", { roomId, message, mySocketID, otherUserID });
     };
 
     const handleKeyPress = (event) => {
@@ -373,73 +378,192 @@ const Room = () => {
     };
 
     return (
-        <div className="room-container">
-            <ToastContainer />
-            <div className="video-container">
+        <section
+            className="-z-20 min-h-dvh"
+            style={{
+                backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20' fill='none' stroke-width='2' stroke='%23E0E0E0'%3e%3cpath d='M0 .5H19.5V20'/%3e%3c/svg%3e")`,
+            }}
+        >
+            <Toaster
+                position="top-center"
+                reverseOrder={false}
+                toastOptions={{ duration: 3000 }}
+            />
+            <div className="container grid gap-2 md:gap-8 lg:grid-cols-2">
                 {/* Local Video Window */}
-                <div className="video-box local-video">
+                <div className="relative flex items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-gray-300 bg-gray-100 object-contain shadow-2xl md:min-h-96">
                     {localStream ? (
-                        <video ref={localVideoRef} autoPlay muted playsInline />
+                        <Fragment>
+                            <video
+                                ref={localVideoRef}
+                                autoPlay
+                                muted
+                                playsInline
+                                className="rotate-y-180"
+                            />
+                            <div className="absolute bottom-5 left-1/2 flex -translate-x-1/2 items-center justify-center gap-4 md:hidden">
+                                {!isStarted ? (
+                                    <button
+                                        className="flex cursor-pointer items-center justify-center gap-1 rounded-xl border border-emerald-200 bg-gradient-to-b from-emerald-500 via-emerald-600 to-emerald-700 px-2 py-1 text-sm font-medium text-white shadow-xl hover:shadow-2xl md:gap-2 md:px-6 md:py-1.5 md:text-xl"
+                                        onClick={handleStart}
+                                    >
+                                        <CirclePlay
+                                            strokeWidth={2.5}
+                                            className="size-5 md:size-6"
+                                        />
+                                        <p>Start</p>
+                                    </button>
+                                ) : waiting && !remoteStream ? (
+                                    <button
+                                        className="flex cursor-pointer items-center justify-center gap-1 rounded-xl border border-amber-200 bg-gradient-to-b from-orange-500 via-yellow-600 to-amber-700 px-2 py-1 text-sm font-medium text-white shadow-xl hover:shadow-2xl md:gap-2 md:px-6 md:py-1.5 md:text-xl"
+                                        onClick={handleStop}
+                                    >
+                                        <CircleStop
+                                            strokeWidth={2.5}
+                                            className="size-5 md:size-6"
+                                        />
+                                        <p>Stop</p>
+                                    </button>
+                                ) : (
+                                    <div className="grid w-full grid-cols-2 gap-5">
+                                        <button
+                                            className="flex cursor-pointer items-center justify-center gap-1 rounded-xl border border-blue-200 bg-gradient-to-b from-cyan-400 via-sky-500 to-blue-600 px-2 py-1 text-sm font-medium text-white shadow-xl hover:shadow-2xl md:gap-2 md:px-6 md:py-1.5 md:text-xl"
+                                            onClick={handleNext}
+                                        >
+                                            <p>Next</p>
+                                            <CircleArrowRight
+                                                strokeWidth={2.5}
+                                                className="size-5 md:size-6"
+                                            />
+                                        </button>
+                                        <button
+                                            className="flex cursor-pointer items-center justify-center gap-1 rounded-xl border border-amber-200 bg-gradient-to-b from-yellow-400 via-yellow-500 to-amber-600 px-2 py-1 text-sm font-medium text-white shadow-xl hover:shadow-2xl md:gap-2 md:px-6 md:py-1.5 md:text-xl"
+                                            onClick={handleStop}
+                                        >
+                                            <CircleStop
+                                                strokeWidth={2.5}
+                                                className="size-5 md:size-6"
+                                            />
+                                            <p>Stop</p>
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </Fragment>
                     ) : (
-                        <div className="video-placeholder">Loading your video...</div>
+                        <div className="flex flex-col items-center gap-4 p-5">
+                            <Loader className="animate-spin [animation-duration:2s] md:size-20" />
+                            <p className="text-center text-xl md:text-3xl">
+                                Loading your video...
+                            </p>
+                        </div>
                     )}
                 </div>
 
                 {/* Remote Video Window */}
-                <div className="video-box remote-video">
+                <div className="flex items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-gray-300 bg-gray-100 object-contain shadow-2xl">
                     {remoteStream ? (
                         <video ref={remoteVideoRef} autoPlay playsInline />
                     ) : (
-                        <div className="video-placeholder">
-                            {waiting ? "Waiting for a stranger..." : "No one connected yet"}
+                        <div className="flex items-center justify-center">
+                            {waiting ? (
+                                <div className="flex flex-col items-center justify-center gap-4 p-5">
+                                    <Loader className="animate-spin [animation-duration:2s] md:size-20" />
+                                    <p className="text-center text-xl md:text-3xl">
+                                        Waiting for other NITian...
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col items-center justify-center p-5">
+                                    <img src="/avatar.png" alt="Avatar" className="size-36" />
+                                    <p className="text-center text-xl md:text-3xl">
+                                        Click on Start button to Search...
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
             </div>
-            <section className="button_chat">
-                <div className="controls">
-                    {!isStarted ? (
-                        <button onClick={handleStart}>Start</button>
-                    ) : (
-                        <>
-                            {waiting && !remoteStream ? (
-                                <p>Waiting for another user...</p>
+            <div className="container grid gap-2 p-4 md:gap-8 lg:grid-cols-2">
+                <div className="flex flex-col justify-between">
+                    <div className="hidden justify-center gap-4 md:flex">
+                        {!isStarted ? (
+                            <button
+                                className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-gradient-to-b from-emerald-500 via-emerald-600 to-emerald-700 px-2 py-1 text-sm font-medium text-white shadow-xl hover:shadow-2xl md:px-6 md:py-1.5 md:text-xl"
+                                onClick={handleStart}
+                            >
+                                <CirclePlay strokeWidth={2.5} className="size-5 md:size-6" />
+                                <p>Start</p>
+                            </button>
+                        ) : waiting && !remoteStream ? (
+                            <button
+                                className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-amber-200 bg-gradient-to-b from-orange-500 via-yellow-600 to-amber-700 px-2 py-1 text-sm font-medium text-white shadow-xl hover:shadow-2xl md:px-6 md:py-1.5 md:text-xl"
+                                onClick={handleStop}
+                            >
+                                <CircleStop strokeWidth={2.5} className="size-5 md:size-6" />
+                                <p>Stop</p>
+                            </button>
+                        ) : (
+                            <div className="grid w-full gap-5 lg:grid-cols-2">
+                                <button
+                                    className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-blue-200 bg-gradient-to-b from-cyan-400 via-sky-500 to-blue-600 px-2 py-1 text-sm font-medium text-white shadow-xl hover:shadow-2xl md:px-6 md:py-1.5 md:text-xl"
+                                    onClick={handleNext}
+                                >
+                                    <p>Next</p>
+                                    <CircleArrowRight
+                                        strokeWidth={2.5}
+                                        className="size-5 md:size-6"
+                                    />
+                                </button>
+                                <button
+                                    className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-amber-200 bg-gradient-to-b from-yellow-400 via-yellow-500 to-amber-600 px-2 py-1 text-sm font-medium text-white shadow-xl hover:shadow-2xl md:px-6 md:py-1.5 md:text-xl"
+                                    onClick={handleStop}
+                                >
+                                    <CircleStop strokeWidth={2.5} className="size-5 md:size-6" />
+                                    <p>Stop</p>
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="flex items-center gap-2 md:gap-4">
+                        <input
+                            onChange={(e) => setMessage(e.target.value)}
+                            type="text"
+                            placeholder="Type a message..."
+                            onKeyDown={handleKeyPress}
+                            value={message}
+                            className="w-full rounded-full bg-gray-100 py-1 pl-4 ring-2 ring-emerald-500 focus:outline-emerald-600 md:py-2"
+                        />
+                        <button
+                            className="flex cursor-pointer items-center justify-center gap-2 rounded-full border border-blue-200 bg-emerald-600 p-1.5 text-sm font-medium text-white shadow-xl hover:shadow-2xl md:p-2.5 md:text-xl"
+                            onClick={sendMessage}
+                        >
+                            <SendHorizonal strokeWidth={2.5} className="size-5 md:size-6" />
+                        </button>
+                    </div>
+                </div>
+
+                <div className="h-44 max-h-44 overflow-y-auto rounded-lg border-2 border-dashed border-gray-300 bg-gray-100 p-4 shadow-xl">
+                    <div className="flex flex-col gap-1">
+                        {messageArray.map(({ message, mySocketId }, index) =>
+                            mySocketID === mySocketId ? (
+                                <div key={index} className="z-10 text-right">
+                                    <b className="text-emerald-600">You:</b>&nbsp;
+                                    <p className="text-black">{message}</p>
+                                </div>
                             ) : (
-                                <>
-                                    <button onClick={handleNext}>Next</button>
-                                    <button onClick={handleStop}>Stop</button>
-                                </>
-                            )}
-                        </>
-                    )}
-                </div>
-
-                <div className="chat-container">
-                    <div className="chat-box">
-                        <div className="messages">
-                            {
-                                messageArray.map(({ message, mySocketId }, index) => (
-                                    mySocketID === mySocketId ?
-                                        <div key={index} style={{ color: "black" }}>
-                                            You : {message}
-                                        </div>
-                                        :
-                                        <div key={index} style={{ color: "black" }}>
-                                            Other : {message}
-                                        </div>
-                                ))
-                            }
-                        </div>
-                    </div>
-                    <div className="chat-input">
-                        <input onChange={(e) => { setMessage(e.target.value) }} type="text" placeholder="Type a message..." onKeyDown={handleKeyPress} value={message} />
-                        <button onClick={sendMessage} >Send</button>
+                                <div key={index} className="z-10 text-left">
+                                    <b className="text-amber-500">Other:</b>&nbsp;
+                                    <p className="text-black">{message}</p>
+                                </div>
+                            ),
+                        )}
                     </div>
                 </div>
-
-
-            </section>
-        </div>
+            </div>
+        </section>
     );
 };
 
