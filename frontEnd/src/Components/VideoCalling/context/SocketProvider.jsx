@@ -14,8 +14,9 @@ export default function SocketProvider(props) {
     const socket = useMemo(
         () =>
             // io("http://localhost:8000", {
-            io("wss://manittv-production.up.railway.app/", {
-                transports: ["websocket"], // Force WebSocket transport to avoid polling issues
+            // io("wss://manittv-production.up.railway.app/", {
+            io("wss://manittv.onrender.com", {
+                transports: ["websocket",  "polling"], // Force WebSocket transport to avoid polling issues
                 reconnection: true, // Enable reconnection
                 reconnectionAttempts: 5, // Number of reconnection attempts
                 reconnectionDelay: 1000, // Delay between reconnection attempts (1 second)
