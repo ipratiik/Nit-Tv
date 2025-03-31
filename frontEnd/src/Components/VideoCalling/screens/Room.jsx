@@ -77,6 +77,32 @@ const Room = () => {
     }, [localStream]);
 
 
+    useEffect(() => {
+        if (!localStream || !peerInstance.current) return;
+    
+        console.log("Adding tracks to peer connection");
+        localStream.getTracks().forEach((track) =>
+            peerInstance.current.webRTCPeer.addTrack(track, localStream)
+        );
+    }, [localStream]);
+
+
+    useEffect(() => {
+        const getMediaStream = async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                setLocalStream(stream);
+            } catch (error) {
+                console.error("Error accessing media devices:", error);
+            }
+        };
+    
+        if (!localStream) getMediaStream();
+    }, []);
+    
+    
+
+
 
     // Set the remote stream on the video element when the stream or ref changes
     useEffect(() => {
@@ -95,7 +121,9 @@ const Room = () => {
             console.log(`Joined room ${roomId} with user ${from}`);
             setRoomId(roomId);
             setWaiting(false);
-            setMySocketId(from)
+            setMySocketId(me)
+            setOtherUserID(from);
+            console.log(from ,  " !and! ", me);
             peerInstance.current = new PeerService(); // Create a new PeerService instance
 
             // Add local stream to the peer connection
@@ -261,8 +289,8 @@ const Room = () => {
             setWaiting(true);
         });
 
-        socket.on("chat-message", ({ roomId, message, mySocketId }) => {
-            console.log(message, " and ", roomId);
+        socket.on("chat-message", ({ roomId, message, mySocketID : mySocketId }) => {
+            console.log("message was delivered :: " , mySocketID )
             setMessageArray((e) => [...e, { message, mySocketId }]);
         });
 
@@ -325,8 +353,10 @@ const Room = () => {
             toast.error("Chat starts when another user joins.");
             return;
         }
+        setMessageArray((e) => [...e, {message, mySocketId : mySocketID}]);
         console.log("Sending message: ", message, "to room:", roomId);
-        socket.emit("chat-message", { roomId, message, mySocketID });
+        console.log("userse for chat are :: " , mySocketID, " !!",  otherUserID)
+        socket.emit("chat-message", { roomId, message, mySocketID , otherUserID});
     };
 
     const handleKeyPress = (event) => {

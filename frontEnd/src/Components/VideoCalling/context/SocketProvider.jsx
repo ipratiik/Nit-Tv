@@ -13,8 +13,8 @@ export default function SocketProvider(props) {
     // Socket for video chat signaling
     const socket = useMemo(
         () =>
-            // io("http://localhost:8000", {
-            io("wss://manittv-production.up.railway.app/", {
+            io("http://localhost:8000", {
+            // io("wss://manittv-production.up.railway.app/", {
                 transports: ["websocket"], // Force WebSocket transport to avoid polling issues
                 reconnection: true, // Enable reconnection
                 reconnectionAttempts: 5, // Number of reconnection attempts

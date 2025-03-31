@@ -62,14 +62,14 @@ io.on("connection", (socket) => {
         io.to(to).emit("ice-candidate", { candidate, from: socket.id });
     });
 
-    socket.on("chat-message", ({ roomId, message, mySocketID }) => {
-        console.log(`Received message in server:`, message, "for room:", roomId);
-        io.emit("chat-message", { roomId, message, mySocketId : mySocketID });
+    socket.on("chat-message", ({ roomId, message, mySocketID, otherUserID : otherUserId }) => {
+        console.log(`Received message in server:`, message, "for room:", roomId,  "users :: " , mySocketID, " !!", otherUserId);
+        io.to(otherUserId).emit("chat-message", { roomId, message, mySocketID });
     });
 
 
     // Handle user disconnection
-    socket.on("disconnect", () => {
+    socket.on("disconnect", () => { 
         availableUsers = availableUsers.filter((id) => id !== socket.id);
         for (const [roomId, users] of rooms.entries()) {
             if (users.includes(socket.id)) {
@@ -94,8 +94,8 @@ function matchUsers(socket) {
         // Add both users to the room
         rooms.set(roomId, [socket.id, otherUserId]);
         socket.join(roomId);
-        io.to(otherUserId).emit("join-room", { roomId, from: socket.id });
-        socket.emit("join-room", { roomId, from: otherUserId });
+        io.to(otherUserId).emit("join-room", { roomId, from: socket.id, me : otherUserId });
+        socket.emit("join-room", { roomId, from: otherUserId, me : socket.id });
 
         console.log(`Matched ${socket.id} with ${otherUserId} in room ${roomId}`);
     } else {
@@ -110,7 +110,7 @@ function leaveRoom(socket, roomId) {
     if (roomId && rooms.has(roomId)) {
         const users = rooms.get(roomId);
         const otherUserId = users.find((id) => id !== socket.id);
-        if (otherUserId) { 
+        if (otherUserId) {
             io.to(otherUserId).emit("user-left", { roomId });
         }
         socket.leave(roomId);
