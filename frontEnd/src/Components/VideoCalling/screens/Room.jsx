@@ -69,10 +69,10 @@ const Room = () => {
           error.message
         );
         if (error.name === "NotAllowedError") {
-          toast.error("Camera/microphone permissions denied");
+          toast.error("Camera/Mic Permission Denied.");
           console.warn("Permissions denied for camera/microphone.");
         } else if (error.name === "NotFoundError") {
-          toast.error("No camera/microphone found");
+          toast.error("No Camera/Mic Found.");
           console.warn("No camera/microphone found.");
         }
       }
@@ -147,7 +147,7 @@ const Room = () => {
       peerInstance.current.webRTCPeer.ontrack = (event) => {
         console.log("Received remote stream:", event.streams[0]);
         setRemoteStream(event.streams[0]);
-        toast.success("Connected with another user!");
+        toast.success("Connected.");
       };
 
       // Log connection state changes
@@ -166,7 +166,7 @@ const Room = () => {
         );
 
         if (peerInstance.current.webRTCPeer.iceConnectionState === "failed") {
-          toast.error("Connection failed. Try clicking Next");
+          toast.error("Connection Failed. Try Clicking Next!");
         }
       };
 
@@ -211,7 +211,7 @@ const Room = () => {
         peerInstance.current.webRTCPeer.ontrack = (event) => {
           console.log("Received remote stream:", event.streams[0]);
           setRemoteStream(event.streams[0]);
-          toast.success("Connected with another user!");
+          toast.success("Connected.");
         };
 
         // Log connection state changes
@@ -230,7 +230,7 @@ const Room = () => {
           );
 
           if (peerInstance.current.webRTCPeer.iceConnectionState === "failed") {
-            toast.error("Connection failed. Try clicking Next");
+            toast.error("Connection Failed. Try Clicking Next!");
           }
         };
 
@@ -253,7 +253,7 @@ const Room = () => {
         socket.emit("answer", { answer, to: from });
       } catch (error) {
         console.error("Error handling offer:", error);
-        toast.error("Connection error. Try clicking Next");
+        toast.error("Connection Error. Try Clicking Next!");
       }
     });
 
@@ -268,7 +268,7 @@ const Room = () => {
           await peerInstance.current.setRemoteDescription(answer);
         } catch (error) {
           console.error("Error setting remote answer:", error);
-          toast.error("Connection error. Try clicking Next");
+          toast.error("Connection Error. Try Clicking Next!");
         }
       } else {
         console.error(
@@ -295,7 +295,7 @@ const Room = () => {
     // When the other user leaves
     socket.on("user-left", () => {
       console.log("Other user left the room");
-      toast.info("Other user left. Click Next to find someone new");
+      toast.info("User Left. Click Next!");
       setRemoteStream(null);
       setRoomId(null);
       if (peerInstance.current) {
@@ -311,7 +311,7 @@ const Room = () => {
     socket.on("waiting", (message) => {
       console.log(message);
       setWaiting(true);
-      toast.info("Searching for another NITian...");
+      toast.info("Searching NITians...");
     });
 
     // Clear messages
@@ -347,7 +347,7 @@ const Room = () => {
   const handleStart = () => {
     setIsStarted(true);
     socket.emit("start");
-    toast.success("Started searching for another NITian");
+    toast.success("Searching NITians..");
   };
 
   // Handle "Next" button click
@@ -363,7 +363,7 @@ const Room = () => {
     setMessageArray([]);
     socket.emit("next", { roomId, otherUserID });
     setRoomId(null);
-    toast.info("Finding next user...");
+    toast.info("Finding Next User.");
   };
 
   // Handle "Stop" button click
@@ -380,7 +380,7 @@ const Room = () => {
       remoteVideoRef.current.srcObject = null;
     }
     socket.emit("stop", { roomId, otherUserID });
-    toast.success("Stopped successfully");
+    toast.success("Stopped Successfully.");
   };
 
   // Toggle audio
@@ -391,7 +391,7 @@ const Room = () => {
         audioTrack.enabled = !audioTrack.enabled;
         setAudioEnabled(audioTrack.enabled);
         toast.success(
-          audioTrack.enabled ? "Microphone unmuted" : "Microphone muted"
+          audioTrack.enabled ? "Microphone Unmuted." : "Microphone Muted."
         );
       }
     }
@@ -404,9 +404,7 @@ const Room = () => {
       if (videoTrack) {
         videoTrack.enabled = !videoTrack.enabled;
         setVideoEnabled(videoTrack.enabled);
-        toast.success(
-          videoTrack.enabled ? "Camera turned on" : "Camera turned off"
-        );
+        toast.success(videoTrack.enabled ? "Camera On." : "Camera Off.");
       }
     }
   };
@@ -416,7 +414,7 @@ const Room = () => {
     if (!message.trim()) return;
 
     if (!roomId) {
-      toast.error("Chat starts when another user joins.");
+      toast.error("Starts When User Joins!");
       return;
     }
     setMessageArray((e) => [...e, { message, mySocketId: mySocketID }]);
@@ -452,7 +450,7 @@ const Room = () => {
       <div className="container mx-auto px-4 py-6 md:py-8">
         <div className="grid gap-4 md:gap-6 lg:grid-cols-2 xl:gap-8">
           {/* Local Video Window */}
-          <div className="relative flex items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-gray-300 bg-gray-100 object-contain shadow-xl md:shadow-2xl min-h-64 md:min-h-80 lg:min-h-64 xl:min-h-96">
+          <div className="relative flex items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-gray-300 bg-gray-100 object-contain shadow-xl md:shadow-2xl h-40 md:h-64 lg:h-80 xl:h-96">
             {localStream ? (
               <Fragment>
                 <video
@@ -467,15 +465,17 @@ const Room = () => {
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 z-10">
                   <button
                     onClick={toggleAudio}
-                    className={`rounded-full p-2 ${audioEnabled ? "bg-green-500" : "bg-red-500"
-                      } text-white`}
+                    className={`rounded-full p-2 ${
+                      audioEnabled ? "bg-green-500" : "bg-red-500"
+                    } text-white`}
                   >
                     {audioEnabled ? <Mic size={20} /> : <MicOff size={20} />}
                   </button>
                   <button
                     onClick={toggleVideo}
-                    className={`rounded-full p-2 ${videoEnabled ? "bg-green-500" : "bg-red-500"
-                      } text-white`}
+                    className={`rounded-full p-2 ${
+                      videoEnabled ? "bg-green-500" : "bg-red-500"
+                    } text-white`}
                   >
                     {videoEnabled ? (
                       <Video size={20} />
@@ -496,7 +496,7 @@ const Room = () => {
           </div>
 
           {/* Remote Video Window */}
-          <div className="flex items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-gray-300 bg-gray-100 object-contain shadow-xl md:shadow-2xl min-h-64 md:min-h-80 lg:min-h-64 xl:min-h-96">
+          <div className="flex items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-gray-300 bg-gray-100 object-contain shadow-xl md:shadow-2xl h-40 md:h-64 lg:h-80 xl:h-96">
             {remoteStream ? (
               <video
                 ref={remoteVideoRef}
@@ -510,7 +510,7 @@ const Room = () => {
                   <div className="flex flex-col items-center justify-center gap-4">
                     <Loader className="animate-spin [animation-duration:2s] size-12 md:size-20" />
                     <p className="text-center text-lg md:text-2xl">
-                      Waiting for other NITian...
+                      Waiting For NITians...
                     </p>
                   </div>
                 ) : (
@@ -521,7 +521,7 @@ const Room = () => {
                       className="size-24 md:size-36"
                     />
                     <p className="text-lg md:text-2xl mt-2">
-                      Click on Start button to Search...
+                      Click Start/Next To Search...
                     </p>
                   </div>
                 )}
