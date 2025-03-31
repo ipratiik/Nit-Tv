@@ -289,6 +289,11 @@ const Room = () => {
             setWaiting(true);
         });
 
+        // clear messages when we clcik stop or next
+        socket.on("clear-Messages", ()=>{
+            setMessageArray([]);
+        })
+
         socket.on("chat-message", ({ roomId, message, mySocketID : mySocketId }) => {
             console.log("message was delivered :: " , mySocketID )
             setMessageArray((e) => [...e, { message, mySocketId }]);
@@ -327,7 +332,8 @@ const Room = () => {
         if (remoteVideoRef.current) {
             remoteVideoRef.current.srcObject = null;
         }
-        socket.emit("next", roomId);
+        setMessageArray([]);
+        socket.emit("next", {roomId, otherUserID});
         setRoomId(null);
     };
 
@@ -344,7 +350,7 @@ const Room = () => {
         if (remoteVideoRef.current) {
             remoteVideoRef.current.srcObject = null;
         }
-        socket.emit("stop", roomId);
+        socket.emit("stop", {roomId, otherUserID});
     };
 
     const sendMessage = () => {

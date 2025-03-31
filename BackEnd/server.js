@@ -34,15 +34,18 @@ io.on("connection", (socket) => {
     });
 
     // When a user clicks "Next", find a new match
-    socket.on("next", (currentRoomId) => {
+    socket.on("next", ({roomId : currentRoomId, otherUserID}) => {
         leaveRoom(socket, currentRoomId);
         matchUsers(socket);
+        io.to(otherUserID).emit("clear-Messages");
+        
     });
 
     // When a user clicks "Stop", remove them from their room and the available pool
-    socket.on("stop", (roomId) => {
+    socket.on("stop", ({roomId, otherUserID}) => {
         leaveRoom(socket, roomId);
         availableUsers = availableUsers.filter((id) => id !== socket.id);
+        io.to(otherUserID).emit("clear-Messages");
         console.log(`User ${socket.id} stopped the stream`);
     });
 
