@@ -87,7 +87,7 @@ export default function Home() {
     <div
       className="-z-20 min-h-dvh"
       style={{
-        backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20' fill='none' stroke-width='2' stroke='%23E0E0E0'%3e%3cpath d='M0 .5H19.5V20'/%3e%3c/svg%3e")`,
+        backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20' fill='none' strokeWidth='2' stroke='%23E0E0E0'%3e%3cpath d='M0 .5H19.5V20'/%3e%3c/svg%3e")`,
       }}
     >
       <Toaster
@@ -197,26 +197,16 @@ export default function Home() {
             <p>💬 Text Chat.</p>
             <p>🙊 Unlimited Gossip.</p>
           </div>
-          <div className="text-xm z-10 max-w-5xl text-center font-bold md:hidden">
-            <p>
-              Feeling adventurous? Join random NITians in surprise chat rooms
-              and make new friends.
-            </p>
-          </div>
+          <p className="text-xm z-10 max-w-5xl text-center font-bold md:hidden">
+            Feeling adventurous? Join random NITians in surprise chat rooms and
+            make new friends.
+          </p>
           {!user && (
             <p className="z-10 hidden max-w-5xl text-center text-xs font-medium md:block md:text-base">
               Whether it&apos;s banter, brainstorming, or just random gossip –
               NIT TV is your spot!
               <br />
               We've got you covered!
-            </p>
-          )}
-          {user && (
-            <p className="z-10 hidden max-w-5xl text-center text-xs font-medium md:block md:text-base">
-              Feeling adventurous? Join random NITians in surprise chat rooms
-              and make new friends.
-              <br />
-              We&apos;ve got you covered!
             </p>
           )}
           {user ? (
@@ -249,10 +239,7 @@ export default function Home() {
                   Sign In With Google
                 </p>
               </button>
-              <button
-                className="z-10 flex cursor-pointer items-center gap-2 rounded-xl border border-emerald-200 bg-gradient-to-b from-emerald-500 via-emerald-600 to-emerald-700 px-4 py-2 font-medium text-white shadow-xl hover:shadow-2xl"
-                onClick={handleGoogleLogin}
-              >
+              <button className="z-10 flex cursor-pointer items-center gap-2 rounded-xl border border-emerald-200 bg-gradient-to-b from-emerald-500 via-emerald-600 to-emerald-700 px-4 py-2 font-medium text-white shadow-xl hover:shadow-2xl">
                 <svg
                   fill="#ffffff"
                   viewBox="0 0 512 512"
@@ -261,11 +248,11 @@ export default function Home() {
                   height={20}
                   width={20}
                 >
-                  <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                  <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
                   <g
                     id="SVGRepo_tracerCarrier"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   ></g>
                   <g id="SVGRepo_iconCarrier">
                     <g id="OTP">

@@ -350,7 +350,7 @@ const Room = () => {
 
   return (
     <section
-      className="-z-20 h-dvh"
+      className="-z-20 min-h-dvh"
       style={{
         backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='20' height='20' fill='none' stroke-width='2' stroke='%23E0E0E0'%3e%3cpath d='M0 .5H19.5V20'/%3e%3c/svg%3e")`,
       }}
@@ -360,43 +360,61 @@ const Room = () => {
         reverseOrder={false}
         toastOptions={{ duration: 3000 }}
       />
-      <div className="container grid gap-8 lg:grid-cols-2">
+      <div className="container grid gap-2 md:gap-8 lg:grid-cols-2">
         {/* Local Video Window */}
-        <div className="relative flex items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-gray-300 bg-gray-100 object-contain md:min-h-96">
+        <div className="relative flex items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-gray-300 bg-gray-100 object-contain shadow-2xl md:min-h-96">
           {localStream ? (
             <Fragment>
-              <video ref={localVideoRef} autoPlay muted playsInline />
+              <video
+                ref={localVideoRef}
+                autoPlay
+                muted
+                playsInline
+                className="rotate-y-180"
+              />
               <div className="absolute bottom-5 left-1/2 flex -translate-x-1/2 items-center justify-center gap-4 md:hidden">
                 {!isStarted ? (
                   <button
-                    className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-gradient-to-b from-emerald-500 via-emerald-600 to-emerald-700 px-2 py-1 font-medium text-white shadow-xl hover:shadow-2xl md:px-6 md:py-1.5 md:text-xl"
+                    className="flex cursor-pointer items-center justify-center gap-1 rounded-xl border border-emerald-200 bg-gradient-to-b from-emerald-500 via-emerald-600 to-emerald-700 px-2 py-1 text-sm font-medium text-white shadow-xl hover:shadow-2xl md:gap-2 md:px-6 md:py-1.5 md:text-xl"
                     onClick={handleStart}
                   >
-                    <CirclePlay strokeWidth={2.5} />
+                    <CirclePlay
+                      strokeWidth={2.5}
+                      className="size-5 md:size-6"
+                    />
                     <p>Start</p>
                   </button>
                 ) : waiting && !remoteStream ? (
                   <button
-                    className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-amber-200 bg-gradient-to-b from-orange-500 via-yellow-600 to-amber-700 px-2 py-1 font-medium text-white shadow-xl hover:shadow-2xl md:px-6 md:py-1.5 md:text-xl"
+                    className="flex cursor-pointer items-center justify-center gap-1 rounded-xl border border-amber-200 bg-gradient-to-b from-orange-500 via-yellow-600 to-amber-700 px-2 py-1 text-sm font-medium text-white shadow-xl hover:shadow-2xl md:gap-2 md:px-6 md:py-1.5 md:text-xl"
                     onClick={handleStop}
                   >
-                    <CircleStop strokeWidth={2.5} />
+                    <CircleStop
+                      strokeWidth={2.5}
+                      className="size-5 md:size-6"
+                    />
                     <p>Stop</p>
                   </button>
                 ) : (
-                  <div className="grid w-full gap-5 lg:grid-cols-2">
+                  <div className="grid w-full grid-cols-2 gap-5">
                     <button
-                      className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-blue-200 bg-gradient-to-b from-cyan-400 via-sky-500 to-blue-600 px-2 py-1 font-medium text-white shadow-xl hover:shadow-2xl md:px-6 md:py-1.5 md:text-xl"
+                      className="flex cursor-pointer items-center justify-center gap-1 rounded-xl border border-blue-200 bg-gradient-to-b from-cyan-400 via-sky-500 to-blue-600 px-2 py-1 text-sm font-medium text-white shadow-xl hover:shadow-2xl md:gap-2 md:px-6 md:py-1.5 md:text-xl"
                       onClick={handleNext}
                     >
                       <p>Next</p>
-                      <CircleArrowRight strokeWidth={2.5} />
+                      <CircleArrowRight
+                        strokeWidth={2.5}
+                        className="size-5 md:size-6"
+                      />
                     </button>
                     <button
-                      className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-amber-200 bg-gradient-to-b from-yellow-400 via-yellow-500 to-amber-600 px-2 py-1 font-medium text-white shadow-xl hover:shadow-2xl md:px-6 md:py-1.5 md:text-xl"
+                      className="flex cursor-pointer items-center justify-center gap-1 rounded-xl border border-amber-200 bg-gradient-to-b from-yellow-400 via-yellow-500 to-amber-600 px-2 py-1 text-sm font-medium text-white shadow-xl hover:shadow-2xl md:gap-2 md:px-6 md:py-1.5 md:text-xl"
                       onClick={handleStop}
                     >
-                      <CircleStop strokeWidth={2.5} />
+                      <CircleStop
+                        strokeWidth={2.5}
+                        className="size-5 md:size-6"
+                      />
                       <p>Stop</p>
                     </button>
                   </div>
@@ -414,7 +432,7 @@ const Room = () => {
         </div>
 
         {/* Remote Video Window */}
-        <div className="flex items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-gray-300 bg-gray-100 object-contain">
+        <div className="flex items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-gray-300 bg-gray-100 object-contain shadow-2xl">
           {remoteStream ? (
             <video ref={remoteVideoRef} autoPlay playsInline />
           ) : (
@@ -427,8 +445,8 @@ const Room = () => {
                   </p>
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center gap-4 p-5">
-                  <Loader className="animate-spin [animation-duration:2s] md:size-20" />
+                <div className="flex flex-col items-center justify-center p-5">
+                  <img src="/avatar.png" alt="Avatar" className="size-36" />
                   <p className="text-center text-xl md:text-3xl">
                     Click on Start button to Search...
                   </p>
@@ -438,46 +456,49 @@ const Room = () => {
           )}
         </div>
       </div>
-      <div className="container grid gap-4 p-4 lg:grid-cols-2">
+      <div className="container grid gap-2 p-4 md:gap-8 lg:grid-cols-2">
         <div className="flex flex-col justify-between">
           <div className="hidden justify-center gap-4 md:flex">
             {!isStarted ? (
               <button
-                className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-gradient-to-b from-emerald-500 via-emerald-600 to-emerald-700 px-2 py-1 font-medium text-white shadow-xl hover:shadow-2xl md:px-6 md:py-1.5 md:text-xl"
+                className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-gradient-to-b from-emerald-500 via-emerald-600 to-emerald-700 px-2 py-1 text-sm font-medium text-white shadow-xl hover:shadow-2xl md:px-6 md:py-1.5 md:text-xl"
                 onClick={handleStart}
               >
-                <CirclePlay strokeWidth={2.5} />
+                <CirclePlay strokeWidth={2.5} className="size-5 md:size-6" />
                 <p>Start</p>
               </button>
             ) : waiting && !remoteStream ? (
               <button
-                className="flex items-center justify-center gap-2 rounded-xl border border-amber-200 bg-gradient-to-b from-orange-500 via-yellow-600 to-amber-700 px-2 py-1 font-medium text-white shadow-xl hover:shadow-2xl md:px-6 md:py-1.5 md:text-xl"
+                className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-amber-200 bg-gradient-to-b from-orange-500 via-yellow-600 to-amber-700 px-2 py-1 text-sm font-medium text-white shadow-xl hover:shadow-2xl md:px-6 md:py-1.5 md:text-xl"
                 onClick={handleStop}
               >
-                <CircleStop strokeWidth={2.5} />
+                <CircleStop strokeWidth={2.5} className="size-5 md:size-6" />
                 <p>Stop</p>
               </button>
             ) : (
               <div className="grid w-full gap-5 lg:grid-cols-2">
                 <button
-                  className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-blue-200 bg-gradient-to-b from-cyan-400 via-sky-500 to-blue-600 px-2 py-1 font-medium text-white shadow-xl hover:shadow-2xl md:px-6 md:py-1.5 md:text-xl"
+                  className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-blue-200 bg-gradient-to-b from-cyan-400 via-sky-500 to-blue-600 px-2 py-1 text-sm font-medium text-white shadow-xl hover:shadow-2xl md:px-6 md:py-1.5 md:text-xl"
                   onClick={handleNext}
                 >
-                  <p>Next </p>
-                  <CircleArrowRight strokeWidth={2.5} />
+                  <p>Next</p>
+                  <CircleArrowRight
+                    strokeWidth={2.5}
+                    className="size-5 md:size-6"
+                  />
                 </button>
                 <button
-                  className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-amber-200 bg-gradient-to-b from-yellow-400 via-yellow-500 to-amber-600 px-2 py-1 font-medium text-white shadow-xl hover:shadow-2xl md:px-6 md:py-1.5 md:text-xl"
+                  className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-amber-200 bg-gradient-to-b from-yellow-400 via-yellow-500 to-amber-600 px-2 py-1 text-sm font-medium text-white shadow-xl hover:shadow-2xl md:px-6 md:py-1.5 md:text-xl"
                   onClick={handleStop}
                 >
-                  <CircleStop strokeWidth={2.5} />
+                  <CircleStop strokeWidth={2.5} className="size-5 md:size-6" />
                   <p>Stop</p>
                 </button>
               </div>
             )}
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
             <input
               onChange={(e) => setMessage(e.target.value)}
               type="text"
@@ -487,7 +508,7 @@ const Room = () => {
               className="w-full rounded-full bg-gray-100 py-1 pl-4 ring-2 ring-emerald-500 focus:outline-emerald-600 md:py-2"
             />
             <button
-              className="flex cursor-pointer items-center justify-center gap-2 rounded-full border border-blue-200 bg-emerald-600 p-1.5 font-medium text-white shadow-xl hover:shadow-2xl md:p-2.5 md:text-xl"
+              className="flex cursor-pointer items-center justify-center gap-2 rounded-full border border-blue-200 bg-emerald-600 p-1.5 text-sm font-medium text-white shadow-xl hover:shadow-2xl md:p-2.5 md:text-xl"
               onClick={sendMessage}
             >
               <SendHorizonal strokeWidth={2.5} className="size-5 md:size-6" />
@@ -495,15 +516,15 @@ const Room = () => {
           </div>
         </div>
 
-        <div className="h-44 max-h-44 overflow-y-auto rounded-lg border-2 border-dashed border-gray-300 bg-white p-4 shadow-xl">
+        <div className="h-44 max-h-44 overflow-y-auto rounded-lg border-2 border-dashed border-gray-300 bg-gray-100 p-4 shadow-xl">
           <div className="flex flex-col gap-1">
             {messageArray.map(({ message, mySocketId }, index) =>
               mySocketID === mySocketId ? (
-                <div key={index} className="text-right text-black">
+                <div key={index} className="z-10 text-right text-emerald-600">
                   <b>You:</b> <p>{message}</p>
                 </div>
               ) : (
-                <div key={index} className="text-left text-black">
+                <div key={index} className="z-10 text-left text-amber-500">
                   <b>Other:</b> <p>{message}</p>
                 </div>
               ),
