@@ -548,7 +548,7 @@ const Room = () => {
                   <p>Stop</p>
                 </button>
               ) : (
-                <div className="grid w-full gap-4 lg:grid-cols-2">
+                <div className="grid w-full gap-4 grid-cols-2">
                   <button
                     className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-blue-200 bg-gradient-to-b from-cyan-400 via-sky-500 to-blue-600 px-3 py-1 md:px-6 md:py-2.5 text-lg font-medium text-white shadow-xl hover:shadow-2xl transition-all"
                     onClick={handleNext}
