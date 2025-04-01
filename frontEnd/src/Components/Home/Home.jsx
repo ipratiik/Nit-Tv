@@ -51,25 +51,61 @@ export default function Home() {
   }, []);
 
   const handleGoogleLogin = async () => {
+
     try {
       const result = await signInWithPopup(auth, provider);
       const email = result.user.email;
 
-      // Restrict login to NIT students
-      // if (
-      //   !email.endsWith('@stu.manit.ac.in') &&
-      //   !email.endsWith('@nit.ac.in')
-      // ) {
-      //   setError('Only NIT students can log in.');
-      //   await signOut(auth); // Log out unauthorized users
-      //   toast.error('Login Failed! Try Again!');
-      //   return;
+      // Restrict login to students not from NITs
+      const nitEmailDomains = [
+        "mnnit.ac.in",
+        "nitap.ac.in",
+        "manit.ac.in",
+        "nitc.ac.in",
+        "nitdelhi.ac.in",
+        "nitdgp.ac.in",
+        "nitgoa.ac.in",
+        "nith.ac.in",
+        "mnit.ac.in",
+        "nitj.ac.in",
+        "nitjsr.ac.in",
+        "nitk.edu.in",
+        "nitkkr.ac.in",
+        "nitmanipur.ac.in",
+        "nitm.ac.in",
+        "nitmz.ac.in",
+        "vnit.ac.in",
+        "nitnagaland.ac.in",
+        "nitp.ac.in",
+        "nitpy.ac.in",
+        "nitrr.ac.in",
+        "nitrkl.ac.in",
+        "nitsikkim.ac.in",
+        "nits.ac.in",
+        "nitsri.net",
+        "nitt.edu",
+        "nituk.ac.in",
+        "nitw.ac.in",
+        "nitdelhi.ac.in",
+        "nitap.ac.in",
+      ];
+
+      const isValid = nitEmailDomains.some((domain) => email.includes(domain));
+
+      // if (!isValid) {
+      //   setError('Only students from NITs can log in.');
+      //   await signOut(auth);
+      //   toast.error('Only students from NITs can log in.');
+      //   return false; // Indicate failure
       // }
 
       setUser(result.user);
       setError(''); // Clear any previous errors
       toast.success(`Welcome, ${result.user.displayName}.`);
-    } catch (err) {
+
+    }
+
+    catch (err) {
       setError('Login failed. Try again.');
       console.error(err);
       toast.error('Login Failed! Try Again!');
@@ -106,9 +142,8 @@ export default function Home() {
             />
           </Link>
           <button
-            className={`${
-              user ? 'bg-red-500' : 'bg-emerald-600'
-            } m-2 inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl px-4 tracking-wide text-white`}
+            className={`${user ? 'bg-red-500' : 'bg-emerald-600'
+              } m-2 inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl px-4 tracking-wide text-white`}
             onClick={user ? handleLogout : handleGoogleLogin}
           >
             {user ? (
@@ -189,12 +224,13 @@ export default function Home() {
             </p>
           )}
           <p className="z-10 hidden max-w-5xl text-center text-3xl font-bold md:block">
-            🎥 Video Chat. 💬 Text Chat. 🙊 Unlimited Gossip.
+            🎥 Video Chat. &nbsp; 💬 Text Chat. &nbsp; 🙊 Unlimited Gossip. &nbsp; 💡Project Ideas
           </p>
           <div className="z-10 flex flex-col gap-2 text-center text-xl font-bold md:hidden">
             <p>🎥 Video Chat.</p>
             <p>💬 Text Chat.</p>
             <p>🙊 Unlimited Gossip.</p>
+            <p>💡 Project Ideas</p>
           </div>
           <p className="text-xm z-10 max-w-5xl text-center font-bold md:hidden">
             Feeling adventurous? Join random NITians in surprise chat rooms and
