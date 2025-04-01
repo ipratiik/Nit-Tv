@@ -9,10 +9,11 @@ export const useSocket = () => {
     return socket;
 };
 
+let backEndLink = import.meta.env.VITE_BACK_END_LINK;
+
 export default function SocketProvider(props) {
 
     const socket = useMemo(() => {
-        const backEndLink = import.meta.env.BACK_END_LINK; 
         return io(`wss://${backEndLink}`, {
             transports: ["websocket", "polling"], // Force WebSocket transport to avoid polling issues
             reconnection: true, // Enable reconnection
