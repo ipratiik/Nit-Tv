@@ -293,7 +293,7 @@ const Room = () => {
     // When the other user leaves
     socket.on("user-left", () => {
       console.log("Other user left the room");
-      toast.info("User Left. Click Next!");
+      toast.success("User Left. Click Next!");
       setRemoteStream(null);
       setRoomId(null);
       if (peerInstance.current) {
@@ -309,12 +309,14 @@ const Room = () => {
     socket.on("waiting", (message) => {
       console.log(message);
       setWaiting(true);
-      toast.info("Searching NITians...");
+      toast.success("Searching NITians...");
     });
 
     // Clear messages
     socket.on("clear-Messages", () => {
       setMessageArray([]);
+      setWaiting(true);
+      socket.emit("next", { roomId, otherUserID });
     });
 
     // Receive chat message
@@ -361,7 +363,7 @@ const Room = () => {
     setMessageArray([]);
     socket.emit("next", { roomId, otherUserID });
     setRoomId(null);
-    toast.info("Finding Next User.");
+    toast.success("Finding Next User.");
   };
 
   // Handle "Stop" button click
@@ -466,17 +468,15 @@ const Room = () => {
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 z-10">
                   <button
                     onClick={toggleAudio}
-                    className={`rounded-full p-2 ${
-                      audioEnabled ? "bg-green-500" : "bg-red-500"
-                    } text-white cursor-pointer`}
+                    className={`rounded-full p-2 ${audioEnabled ? "bg-green-500" : "bg-red-500"
+                      } text-white cursor-pointer`}
                   >
                     {audioEnabled ? <Mic size={20} /> : <MicOff size={20} />}
                   </button>
                   <button
                     onClick={toggleVideo}
-                    className={`rounded-full p-2 ${
-                      videoEnabled ? "bg-green-500" : "bg-red-500"
-                    } text-white cursor-pointer`}
+                    className={`rounded-full p-2 ${videoEnabled ? "bg-green-500" : "bg-red-500"
+                      } text-white cursor-pointer`}
                   >
                     {videoEnabled ? (
                       <Video size={20} />
