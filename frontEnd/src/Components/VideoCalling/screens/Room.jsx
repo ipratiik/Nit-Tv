@@ -453,7 +453,7 @@ const Room = () => {
       <div className="container mx-auto px-4 py-6 md:py-8">
         <div className="grid gap-4 md:gap-6 lg:grid-cols-2 xl:gap-8">
           {/* Local Video Window */}
-          <div className="relative flex items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-gray-300 bg-gray-100 object-contain shadow-xl md:shadow-2xl h-82 md:h-64 lg:h-80 xl:h-96">
+          <div className="relative flex items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-gray-300 bg-gray-100 object-contain shadow-xl md:shadow-2xl h-82 md:h-64 lg:h-90 xl:h-96">
             {localStream ? (
               <Fragment>
                 <video
@@ -468,15 +468,17 @@ const Room = () => {
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 z-10">
                   <button
                     onClick={toggleAudio}
-                    className={`rounded-full p-2 ${audioEnabled ? "bg-green-500" : "bg-red-500"
-                      } text-white cursor-pointer`}
+                    className={`rounded-full p-2 ${
+                      audioEnabled ? "bg-green-500" : "bg-red-500"
+                    } text-white cursor-pointer`}
                   >
                     {audioEnabled ? <Mic size={20} /> : <MicOff size={20} />}
                   </button>
                   <button
                     onClick={toggleVideo}
-                    className={`rounded-full p-2 ${videoEnabled ? "bg-green-500" : "bg-red-500"
-                      } text-white cursor-pointer`}
+                    className={`rounded-full p-2 ${
+                      videoEnabled ? "bg-green-500" : "bg-red-500"
+                    } text-white cursor-pointer`}
                   >
                     {videoEnabled ? (
                       <Video size={20} />
@@ -497,7 +499,7 @@ const Room = () => {
           </div>
 
           {/* Remote Video Window */}
-          <div className="flex items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-gray-300 bg-gray-100 object-contain shadow-xl md:shadow-2xl h-82 md:h-64 lg:h-80 xl:h-96">
+          <div className="flex items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-gray-300 bg-gray-100 object-contain shadow-xl md:shadow-2xl h-82 md:h-64 lg:h-90 xl:h-96">
             {remoteStream ? (
               <video
                 ref={remoteVideoRef}
