@@ -14,6 +14,7 @@ import {
 
 import { LogIn, LogOut } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
+import avatarIMG from "../../../public/avatar.png"
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -41,7 +42,7 @@ export default function Home() {
 
   useEffect(() => {
     toast.success("Please wait while we check for login", {
-      duration: 5000,
+      duration: 3000,
     });
   }, [])
 
@@ -51,12 +52,12 @@ export default function Home() {
       if (loggedInUser) {
         setUser(loggedInUser);
         toast.success("Login found enjoy NIT TV", {
-          duration: 5000,
+          duration: 2000,
         });
       } else {
         setUser(null);
         toast.error("No Login found, please use gmail to continue", {
-          duration: 5000,
+          duration: 2000,
         });
       }
     });
@@ -106,12 +107,11 @@ export default function Home() {
 
       const isValid = nitEmailDomains.some((domain) => email.includes(domain));
 
-      // if (!isValid) {
-      //   setError('Only students from NITs can log in.');
-      //   await signOut(auth);
-      //   toast.error('Only students from NITs can log in.');
-      //   return false; // Indicate failure
-      // }
+      if (!isValid) {
+        await signOut(auth);
+        toast.error('Only NITs emil ID allowed');
+        return false; // Indicate failure
+      }
 
       setUser(result.user);
       setError(''); // Clear any previous errors
@@ -210,20 +210,31 @@ export default function Home() {
             </svg>
           </div>
           {!user && (
-            <div className="z-10 inline-flex w-fit items-center gap-4 rounded-lg border border-emerald-500 bg-emerald-200 px-3 py-1.5">
-              <div className="relative size-2.5 rounded-full bg-green-500">
-                <span className="ping-large absolute inset-0 rounded-full bg-green-600" />
-              </div>
+            <>
+              <div className="z-10 inline-flex w-fit items-center gap-4 rounded-lg border border-emerald-500 bg-emerald-200 px-3 py-1.5">
+                <div className="relative size-2.5 rounded-full bg-green-500">
+                  <span className="ping-large absolute inset-0 rounded-full bg-green-600" />
+                </div>
 
-              <p className="text-xs font-bold text-black">
-                Hop In - No Attendance Required
-              </p>
-            </div>
+                <p className="text-xs font-bold text-black">
+                  Hop In - No Attendance Required
+                </p>
+              </div>
+              <div className="z-10 inline-flex w-fit items-center gap-4 rounded-lg border border-emerald-500 bg-emerald-200 px-3 py-1.5">
+                <div className="relative size-2.5 rounded-full bg-green-500">
+                  <span className="ping-large absolute inset-0 rounded-full bg-green-600" />
+                </div>
+
+                <p className="text-xs font-bold text-black">
+                  A secure platform that respects your privacy
+                </p>
+              </div>
+            </>
           )}
           {user ? (
             <div className="z-10 flex max-w-5xl flex-col items-center gap-4 text-center text-3xl font-bold md:text-7xl">
               <img
-                src={user.photoURL || '/avatar.png'}
+                src={user.photoURL || avatarIMG}
                 alt="Profile"
                 className="size-36 rounded-3xl border-2"
               />
@@ -285,7 +296,7 @@ export default function Home() {
                 </svg>
 
                 <p className="text-sm tracking-wide text-white">
-                  Sign In With Google
+                  Sign In with NIT's email-ID
                 </p>
               </button>
               {/* <button className="z-10 flex cursor-pointer items-center gap-2 rounded-xl border border-emerald-200 bg-gradient-to-b from-emerald-500 via-emerald-600 to-emerald-700 px-4 py-2 font-medium text-white shadow-xl hover:shadow-2xl">
