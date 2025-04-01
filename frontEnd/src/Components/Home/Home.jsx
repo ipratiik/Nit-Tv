@@ -105,13 +105,13 @@ export default function Home() {
         "nitap.ac.in",
       ];
 
-      const isValid = nitEmailDomains.some((domain) => email.includes(domain));
+      // const isValid = nitEmailDomains.some((domain) => email.includes(domain));
 
-      if (!isValid) {
-        await signOut(auth);
-        toast.error('Only NITs emil ID allowed');
-        return false; // Indicate failure
-      }
+      // if (!isValid) {
+      //   await signOut(auth);
+      //   toast.error('Only NITs emil ID allowed');
+      //   return false; // Indicate failure
+      // }
 
       setUser(result.user);
       setError(''); // Clear any previous errors

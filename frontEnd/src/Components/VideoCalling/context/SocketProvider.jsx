@@ -14,7 +14,8 @@ let backEndLink = import.meta.env.VITE_BACK_END_LINK;
 export default function SocketProvider(props) {
 
     const socket = useMemo(() => {
-        return io(`wss://${backEndLink}`, {
+        // return io(`wss://${backEndLink}`, {
+        return io(`http://localhost:8000`, {
             transports: ["websocket", "polling"], // Force WebSocket transport to avoid polling issues
             reconnection: true, // Enable reconnection
             reconnectionAttempts: 5, // Number of reconnection attempts

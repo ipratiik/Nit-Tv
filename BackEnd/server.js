@@ -75,6 +75,15 @@ io.on("connection", (socket) => {
         io.to(otherUserId).emit("chat-message", { roomId, message, mySocketID });
     });
 
+    socket.on("user-typing", ({roomId, otherUserID}) => {
+        io.to(otherUserID).emit("user-typing");
+        console.log("use is typingr");
+    })
+    socket.on("stop-typing", ({roomId, otherUserID}) => {
+        io.to(otherUserID).emit("stop-typing");
+        console.log("use is stopping typing");
+    })
+
 
     socket.on("disconnect", () => {
         availableUsers = availableUsers.filter((id) => id !== socket.id);

@@ -34,6 +34,7 @@ const Room = () => {
   const [videoEnabled, setVideoEnabled] = useState(true);
   const chatContainerRef = useRef(null);
   const [activeUser, setActiveUser] = useState(3);
+  const [isTyping, setIsTyping] = useState(false);
 
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
@@ -61,7 +62,7 @@ const Room = () => {
         });
         // console.log("Local stream initialized:", stream);
         setLocalStream(stream);
-      } 
+      }
       catch (error) {
         // console.error(
         //   "Error accessing media devices:",
@@ -326,6 +327,15 @@ const Room = () => {
       setActiveUser(numberOfUsers);
     });
 
+    socket.on("user-typing", () => {
+      console.log("user is typing broooooo op");
+      setIsTyping(true);
+    })
+    socket.on("stop-typing", () => {
+      console.log("user is not broooooo op");
+      setIsTyping(false);
+    })
+
     // Cleanup socket listeners on unmount
     return () => {
       socket.off("join-room");
@@ -378,6 +388,17 @@ const Room = () => {
     toast.success("Stopped Successfully.");
   };
 
+
+  const handleChatBlur = () => {
+    console.log("bluring");
+    socket.emit("stop-typing", { roomId, otherUserID });
+  }
+
+  const handleChatFocus = () => {
+    console.log("focusing");
+    socket.emit("user-typing", { roomId, otherUserID });
+  }
+
   // Toggle audio
   const toggleAudio = () => {
     if (localStream) {
@@ -417,7 +438,7 @@ const Room = () => {
     setMessage("");
   };
 
-  // Handle Enter key press in chat input
+  // Handle Enter key press in chat handleChatChange
   const handleKeyPress = (event) => {
     if (event.key === "Enter") {
       sendMessage();
@@ -463,17 +484,15 @@ const Room = () => {
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 z-10">
                   <button
                     onClick={toggleAudio}
-                    className={`rounded-full p-2 ${
-                      audioEnabled ? "bg-green-500" : "bg-red-500"
-                    } text-white cursor-pointer`}
+                    className={`rounded-full p-2 ${audioEnabled ? "bg-green-500" : "bg-red-500"
+                      } text-white cursor-pointer`}
                   >
                     {audioEnabled ? <Mic size={20} /> : <MicOff size={20} />}
                   </button>
                   <button
                     onClick={toggleVideo}
-                    className={`rounded-full p-2 ${
-                      videoEnabled ? "bg-green-500" : "bg-red-500"
-                    } text-white cursor-pointer`}
+                    className={`rounded-full p-2 ${videoEnabled ? "bg-green-500" : "bg-red-500"
+                      } text-white cursor-pointer`}
                   >
                     {videoEnabled ? (
                       <Video size={20} />
@@ -573,12 +592,14 @@ const Room = () => {
             {/* Chat Input */}
             <div className="flex items-center gap-2 md:gap-4 mt-4">
               <input
-                onChange={(e) => setMessage(e.target.value)}
+                onChange={(e) => { setMessage(e.target.value) }}
                 type="text"
                 placeholder="Type Message..."
                 onKeyDown={handleKeyPress}
                 value={message}
                 className="w-full rounded-full bg-white py-2 pl-4 ring-2 ring-emerald-500 focus:outline-emerald-600 transition-all"
+                onFocus={handleChatFocus}
+                onBlur={handleChatBlur}
               />
               <button
                 className="flex cursor-pointer items-center justify-center gap-2 rounded-full border border-blue-200 bg-emerald-600 p-2.5 text-white shadow-xl hover:shadow-2xl hover:bg-emerald-700 transition-all"
@@ -593,12 +614,18 @@ const Room = () => {
           <div
             ref={chatContainerRef}
             className="h-44 max-h-44 overflow-y-auto rounded-lg border-2 border-gray-400 bg-gray-100 p-4 shadow-xl"
+            style={{ position: "relative" }}
           >
+            <b style={{ display: isTyping ? 'inline' : 'none', position: "fixed", top: "-2%", right: "60%", left: "43%", }}>
+              typing...
+            </b>
             <div className="flex flex-col gap-2">
               {messageArray.length === 0 && (
-                <p className="text-center text-gray-500 italic font-extralight">
-                  No Messages Yet.
-                </p>
+                <>
+                  <p className="text-center text-gray-500 italic font-extralight">
+                    No Messages Yet.
+                  </p>
+                </>
               )}
               {messageArray.map(({ message, mySocketId }, index) =>
                 mySocketID === mySocketId ? (
