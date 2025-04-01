@@ -40,17 +40,17 @@ const Room = () => {
   const navigate = useNavigate();
   const auth = getAuth();
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (loggedInUser) => {
-      if (!loggedInUser) {
-        navigate("/");
-      } else {
-        setUser(loggedInUser);
-      }
-    });
+  // useEffect(() => {
+  //   const unsubscribe = onAuthStateChanged(auth, (loggedInUser) => {
+  //     if (!loggedInUser) {
+  //       navigate("/");
+  //     } else {
+  //       setUser(loggedInUser);
+  //     }
+  //   });
 
-    return () => unsubscribe();
-  }, [auth, navigate]);
+  //   return () => unsubscribe();
+  // }, [auth, navigate]);
 
   // local media stream
   useEffect(() => {
