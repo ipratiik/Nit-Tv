@@ -18,8 +18,8 @@ const io = new Server(server, {
     },
 });
 
-// Store users who are available to chat (after clicking "Start")
 let availableUsers = [];
+
 // Store active rooms (key: roomId, value: array of user socket IDs)
 const rooms = new Map();
 
@@ -28,20 +28,18 @@ let activeUsers=0;
 io.on("connection", (socket) => {
     console.log(`User connected: ${socket.id}`);
     activeUsers++;
-    // When a user clicks "Start", add them to the available users pool
     socket.on("start", () => {
         availableUsers.push(socket.id);
-        console.log(`User ${socket.id} is available to chat`);
         matchUsers(socket);
     });
 
     setInterval(() => {
         const numberOfUsers = availableUsers.length + 2*rooms.size;
-        io.emit("active-users", numberOfUsers); // Emit to all connected clients
+        io.emit("active-users", numberOfUsers);
     }, 10000);
 
 
-    // When a user clicks "Next", find a new match
+    // when a user clicks "Next", find a new match
     socket.on("next", ({ roomId: currentRoomId, otherUserID }) => {
         leaveRoom(socket, currentRoomId);
         matchUsers(socket);
@@ -57,7 +55,6 @@ io.on("connection", (socket) => {
         console.log(`User ${socket.id} stopped the stream`);
     });
 
-    // Handle WebRTC signaling
     socket.on("offer", (data) => {
         const { offer, roomId, to } = data;
         io.to(to).emit("offer", { offer, from: socket.id, roomId });
@@ -79,7 +76,6 @@ io.on("connection", (socket) => {
     });
 
 
-    // Handle user disconnection
     socket.on("disconnect", () => {
         availableUsers = availableUsers.filter((id) => id !== socket.id);
         for (const [roomId, users] of rooms.entries()) {
@@ -92,31 +88,28 @@ io.on("connection", (socket) => {
     });
 });
 
-// Function to match users
 function matchUsers(socket) {
-    // Remove the current user from the available pool
+
+    // remove the current user from the available pool
     availableUsers = availableUsers.filter((id) => id !== socket.id);
 
-    // Find another available user to pair with
+    // finding another user
     if (availableUsers.length > 0) {
-        const otherUserId = availableUsers.shift(); // Take the first available user
-        const roomId = `${socket.id}-${otherUserId}`; // Create a unique room ID
+        const otherUserId = availableUsers.shift();
+        const roomId = `${socket.id}-${otherUserId}`;
 
-        // Add both users to the room
         rooms.set(roomId, [socket.id, otherUserId]);
         socket.join(roomId);
         io.to(otherUserId).emit("join-room", { roomId, from: socket.id, me: otherUserId });
         socket.emit("join-room", { roomId, from: otherUserId, me: socket.id });
-
         console.log(`Matched ${socket.id} with ${otherUserId} in room ${roomId}`);
-    } else {
-        // No other users available, add this user back to the pool
+    } 
+    else {
         availableUsers.push(socket.id);
         socket.emit("waiting", "Waiting for another user...");
     }
 }
 
-// Function to handle leaving a room
 function leaveRoom(socket, roomId) {
     if (roomId && rooms.has(roomId)) {
         const users = rooms.get(roomId);

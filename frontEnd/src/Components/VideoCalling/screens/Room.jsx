@@ -39,7 +39,6 @@ const Room = () => {
   const navigate = useNavigate();
   const auth = getAuth();
 
-  // Authentication check
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (loggedInUser) => {
       if (!loggedInUser) {
@@ -52,7 +51,7 @@ const Room = () => {
     return () => unsubscribe();
   }, [auth, navigate]);
 
-  // Initialize local media stream
+  // local media stream
   useEffect(() => {
     const initLocalStream = async () => {
       try {
@@ -60,20 +59,21 @@ const Room = () => {
           video: true,
           audio: true,
         });
-        console.log("Local stream initialized:", stream);
+        // console.log("Local stream initialized:", stream);
         setLocalStream(stream);
-      } catch (error) {
-        console.error(
-          "Error accessing media devices:",
-          error.name,
-          error.message
-        );
+      } 
+      catch (error) {
+        // console.error(
+        //   "Error accessing media devices:",
+        //   error.name,
+        //   error.message
+        // );
         if (error.name === "NotAllowedError") {
           toast.error("Camera/Mic Permission Denied.");
-          console.warn("Permissions denied for camera/microphone.");
+          // console.warn("Permissions denied for camera/microphone.");
         } else if (error.name === "NotFoundError") {
           toast.error("No Camera/Mic Found.");
-          console.warn("No camera/microphone found.");
+          // console.warn("No camera/microphone found.");
         }
       }
     };
@@ -81,16 +81,16 @@ const Room = () => {
 
     return () => {
       if (localStream) {
-        console.log("Cleaning up local stream");
+        // console.log("cleaning up local stream");
         localStream.getTracks().forEach((track) => track.stop());
       }
     };
   }, []);
 
-  // Set local video stream to video element
+  // seting local video stream to video element
   useEffect(() => {
     if (localStream && localVideoRef.current) {
-      console.log("Assigning local stream to video element");
+      // console.log("Assigning local stream to video element");
       localVideoRef.current.srcObject = localStream;
     }
   }, [localStream]);
@@ -99,7 +99,7 @@ const Room = () => {
   useEffect(() => {
     if (!localStream || !peerInstance.current) return;
 
-    console.log("Adding tracks to peer connection");
+    // console.log("Adding tracks to peer connection");
     localStream
       .getTracks()
       .forEach((track) =>
@@ -111,7 +111,7 @@ const Room = () => {
   useEffect(() => {
     if (remoteStream && remoteVideoRef.current) {
       remoteVideoRef.current.srcObject = remoteStream;
-      console.log("Remote stream set on video element via useEffect");
+      // console.log("Remote stream set on video element via useEffect");
     }
   }, [remoteStream]);
 
@@ -129,40 +129,39 @@ const Room = () => {
 
     // When matched with another user
     socket.on("join-room", async ({ roomId, from, me }) => {
-      console.log(`Joined room ${roomId} with user ${from}`);
       setRoomId(roomId);
       setWaiting(false);
       setMySocketId(me);
       setOtherUserID(from);
       peerInstance.current = new PeerService();
 
-      // Add local stream to the peer connection
+      // addinf local stream to the peer connection
       localStream
         .getTracks()
         .forEach((track) =>
           peerInstance.current.webRTCPeer.addTrack(track, localStream)
         );
 
-      // Listen for remote stream
+      // listening for remote stream
       peerInstance.current.webRTCPeer.ontrack = (event) => {
-        console.log("Received remote stream:", event.streams[0]);
+        // console.log("Received remote stream:", event.streams[0]);
         setRemoteStream(event.streams[0]);
       };
 
-      // Log connection state changes
+      // log connection state changes
       peerInstance.current.webRTCPeer.onconnectionstatechange = () => {
-        console.log(
-          "Connection state:",
-          peerInstance.current.webRTCPeer.connectionState
-        );
+        // console.log(
+        //   "Connection state:",
+        //   peerInstance.current.webRTCPeer.connectionState
+        // );
       };
 
       // Log ICE connection state changes
       peerInstance.current.webRTCPeer.oniceconnectionstatechange = () => {
-        console.log(
-          "ICE connection state:",
-          peerInstance.current.webRTCPeer.iceConnectionState
-        );
+        // console.log(
+        //   "ICE connection state:",
+        //   peerInstance.current.webRTCPeer.iceConnectionState
+        // );
 
         if (peerInstance.current.webRTCPeer.iceConnectionState === "failed") {
           toast.error("Connection Failed. Try Clicking Next!");
@@ -172,7 +171,7 @@ const Room = () => {
       // Handle ICE candidates
       peerInstance.current.webRTCPeer.onicecandidate = (event) => {
         if (event.candidate) {
-          console.log("Sending ICE candidate");
+          // console.log("Sending ICE candidate");
           socket.emit("ice-candidate", {
             candidate: event.candidate,
             to: from,
@@ -183,7 +182,7 @@ const Room = () => {
       // Decide which peer creates the offer based on socket IDs
       if (socket.id < from) {
         // This peer creates the offer
-        console.log("This peer is the offerer");
+        // console.log("This peer is the offerer");
         const offer = await peerInstance.current.getOffer();
         socket.emit("offer", { offer, roomId, to: from });
       }
@@ -191,7 +190,7 @@ const Room = () => {
 
     // Receive an offer
     socket.on("offer", async ({ offer, from, roomId }) => {
-      console.log(`Received offer from ${from} in room ${roomId}`);
+      // console.log(`Received offer from ${from} in room ${roomId}`);
       setRoomId(roomId);
       setWaiting(false);
 
@@ -208,24 +207,24 @@ const Room = () => {
 
         // Listen for remote stream
         peerInstance.current.webRTCPeer.ontrack = (event) => {
-          console.log("Received remote stream:", event.streams[0]);
+          // console.log("Received remote stream:", event.streams[0]);
           setRemoteStream(event.streams[0]);
         };
 
         // Log connection state changes
         peerInstance.current.webRTCPeer.onconnectionstatechange = () => {
-          console.log(
-            "Connection state:",
-            peerInstance.current.webRTCPeer.connectionState
-          );
+          // console.log(
+          //   "Connection state:",
+          //   peerInstance.current.webRTCPeer.connectionState
+          // );
         };
 
         // Log ICE connection state changes
         peerInstance.current.webRTCPeer.oniceconnectionstatechange = () => {
-          console.log(
-            "ICE connection state:",
-            peerInstance.current.webRTCPeer.iceConnectionState
-          );
+          // console.log(
+          //   "ICE connection state:",
+          //   peerInstance.current.webRTCPeer.iceConnectionState
+          // );
 
           if (peerInstance.current.webRTCPeer.iceConnectionState === "failed") {
             toast.error("Connection Failed. Try Clicking Next!");
@@ -235,7 +234,7 @@ const Room = () => {
         // Handle ICE candidates
         peerInstance.current.webRTCPeer.onicecandidate = (event) => {
           if (event.candidate) {
-            console.log("Sending ICE candidate");
+            // console.log("Sending ICE candidate");
             socket.emit("ice-candidate", {
               candidate: event.candidate,
               to: from,
@@ -250,14 +249,13 @@ const Room = () => {
         const answer = await peerInstance.current.getAnswer(offer);
         socket.emit("answer", { answer, to: from });
       } catch (error) {
-        console.error("Error handling offer:", error);
         toast.error("Connection Error. Try Clicking Next!");
       }
     });
 
     // Receive an answer
     socket.on("answer", async ({ answer }) => {
-      console.log("Received answer");
+      // console.log("Received answer");
       if (
         peerInstance.current &&
         peerInstance.current.webRTCPeer.signalingState === "have-local-offer"
@@ -265,7 +263,7 @@ const Room = () => {
         try {
           await peerInstance.current.setRemoteDescription(answer);
         } catch (error) {
-          console.error("Error setting remote answer:", error);
+          // console.error("Error setting remote answer:", error);
           toast.error("Connection Error. Try Clicking Next!");
         }
       } else {
@@ -278,21 +276,21 @@ const Room = () => {
 
     // Receive an ICE candidate
     socket.on("ice-candidate", async ({ candidate }) => {
-      console.log("Received ICE candidate");
+      // console.log("Received ICE candidate");
       if (peerInstance.current) {
         try {
           await peerInstance.current.webRTCPeer.addIceCandidate(
             new RTCIceCandidate(candidate)
           );
         } catch (error) {
-          console.error("Error adding ICE candidate:", error);
+          // console.error("Error adding ICE candidate:", error);
         }
       }
     });
 
     // When the other user leaves
     socket.on("user-left", () => {
-      console.log("Other user left the room");
+      // console.log("Other user left the room");
       toast.success("User Left. Click Next!");
       setRemoteStream(null);
       setRoomId(null);
@@ -307,7 +305,6 @@ const Room = () => {
 
     // Waiting for another user
     socket.on("waiting", (message) => {
-      console.log(message);
       setWaiting(true);
       toast.success("Searching NITians...");
     });
@@ -321,14 +318,12 @@ const Room = () => {
 
     // Receive chat message
     socket.on("chat-message", ({ roomId, message, mySocketID: mySocketId }) => {
-      console.log("message was delivered :: ", mySocketID);
       setMessageArray((e) => [...e, { message, mySocketId }]);
     });
 
     // active users
     socket.on("active-users", (numberOfUsers) => {
       setActiveUser(numberOfUsers);
-      // console.log("active user :: ", numberOfUsers);
     });
 
     // Cleanup socket listeners on unmount

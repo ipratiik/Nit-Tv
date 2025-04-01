@@ -121,7 +121,6 @@ export default function Home() {
 
     catch (err) {
       setError('Login failed. Try again.');
-      console.error(err);
       toast.error('Login Failed! Try Again!');
     }
   };
