@@ -468,7 +468,7 @@ const Room = () => {
                     onClick={toggleAudio}
                     className={`rounded-full p-2 ${
                       audioEnabled ? "bg-green-500" : "bg-red-500"
-                    } text-white`}
+                    } text-white cursor-pointer`}
                   >
                     {audioEnabled ? <Mic size={20} /> : <MicOff size={20} />}
                   </button>
@@ -476,7 +476,7 @@ const Room = () => {
                     onClick={toggleVideo}
                     className={`rounded-full p-2 ${
                       videoEnabled ? "bg-green-500" : "bg-red-500"
-                    } text-white`}
+                    } text-white cursor-pointer`}
                   >
                     {videoEnabled ? (
                       <Video size={20} />
@@ -578,7 +578,7 @@ const Room = () => {
               <input
                 onChange={(e) => setMessage(e.target.value)}
                 type="text"
-                placeholder="Type a message..."
+                placeholder="Type Message..."
                 onKeyDown={handleKeyPress}
                 value={message}
                 className="w-full rounded-full bg-white py-2 pl-4 ring-2 ring-emerald-500 focus:outline-emerald-600 transition-all"
