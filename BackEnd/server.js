@@ -13,7 +13,7 @@ app.get("/", (req, response) => {
 
 const io = new Server(server, {
     cors: {
-        origin: ["http://localhost:5173", "https://manitv.vercel.app", "https://manitv.live", "https://nittv.vercel.app", "https://nittv.live" ],
+        origin: ["http://localhost:5173", "https://manitv.vercel.app", "https://manitv.live", "https://nittv.vercel.app", "https://nittv.live",  "https://nittvtest.vercel.app" ],
         methods: ["GET", "POST"],
     },
 });
