@@ -336,6 +336,14 @@ const Room = () => {
       setIsTyping(false);
     })
 
+    socket.on("audio-muted", ()=>{
+      toast.error("Other user muted audio");
+    })
+
+    socket.on("video-muted", ()=>{
+      toast.error("Other user muted video");
+    })
+
     // Cleanup socket listeners on unmount
     return () => {
       socket.off("join-room");
@@ -409,6 +417,9 @@ const Room = () => {
         toast.success(
           audioTrack.enabled ? "Microphone Unmuted." : "Microphone Muted."
         );
+        if(!audioTrack.enabled){
+          socket.emit("audio-muted", {roomId, otherUserID});
+        } 
       }
     }
   };
@@ -421,6 +432,9 @@ const Room = () => {
         videoTrack.enabled = !videoTrack.enabled;
         setVideoEnabled(videoTrack.enabled);
         toast.success(videoTrack.enabled ? "Camera On." : "Camera Off.");
+        if(!videoTrack.enabled){
+          socket.emit("video-muted", {roomId, otherUserID});
+        } 
       }
     }
   };
@@ -616,7 +630,7 @@ const Room = () => {
             className="h-44 max-h-44 overflow-y-auto rounded-lg border-2 border-gray-400 bg-gray-100 p-4 shadow-xl"
             style={{ position: "relative" }}
           >
-            <b style={{ display: isTyping ? 'inline' : 'none', position: "fixed", top: "-2%", right: "60%", left: "43%", }}>
+            <b style={{ display: isTyping ? 'inline' : 'none', position: "absolute", top: "-2%", right: "60%", left: "43%", }}>
               typing...
             </b>
             <div className="flex flex-col gap-2">

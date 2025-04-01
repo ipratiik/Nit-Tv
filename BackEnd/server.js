@@ -85,6 +85,15 @@ io.on("connection", (socket) => {
     })
 
 
+    socket.on("audio-muted", ({roomId, otherUserID})=>{
+        io.to(otherUserID).emit("audio-muted");
+    })
+
+    socket.on("video-muted", ({roomId, otherUserID})=>{
+        io.to(otherUserID).emit("video-muted");
+    })
+
+
     socket.on("disconnect", () => {
         availableUsers = availableUsers.filter((id) => id !== socket.id);
         for (const [roomId, users] of rooms.entries()) {
