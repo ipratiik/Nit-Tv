@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { initializeApp } from "firebase/app";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { initializeApp } from 'firebase/app';
+import { useNavigate } from 'react-router-dom';
 import {
   getAuth,
   GoogleAuthProvider,
@@ -11,11 +11,11 @@ import {
   setPersistence,
   browserLocalPersistence,
   updateProfile,
-} from "firebase/auth";
+} from 'firebase/auth';
 
-import { LogIn, LogOut } from "lucide-react";
-import { Toaster, toast } from "react-hot-toast";
-import avatarIMG from "../../../public/avatar.png";
+import { LogIn, LogOut } from 'lucide-react';
+import { Toaster, toast } from 'react-hot-toast';
+import avatarIMG from '/avatar.png';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -37,12 +37,12 @@ setPersistence(auth, browserLocalPersistence).catch(console.error);
 
 export default function Home() {
   const [user, setUser] = useState(null);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    toast.success("Checking For Login!", {
+    toast.success('Checking For Login!', {
       duration: 1000,
     });
   }, []);
@@ -52,12 +52,12 @@ export default function Home() {
     const unsubscribe = onAuthStateChanged(auth, (loggedInUser) => {
       if (loggedInUser) {
         setUser(loggedInUser);
-        toast.success("Login Found.", {
+        toast.success('Login Found.', {
           duration: 2000,
         });
       } else {
         setUser(null);
-        toast.error("No Login Found. Please Login!", {
+        toast.error('No Login Found. Please Login!', {
           duration: 2000,
         });
       }
@@ -73,36 +73,36 @@ export default function Home() {
 
       // Restrict login to students not from NITs
       const nitEmailDomains = [
-        "mnnit.ac.in",
-        "nitap.ac.in",
-        "manit.ac.in",
-        "nitc.ac.in",
-        "nitdelhi.ac.in",
-        "nitdgp.ac.in",
-        "nitgoa.ac.in",
-        "nith.ac.in",
-        "mnit.ac.in",
-        "nitj.ac.in",
-        "nitjsr.ac.in",
-        "nitk.edu.in",
-        "nitkkr.ac.in",
-        "nitmanipur.ac.in",
-        "nitm.ac.in",
-        "nitmz.ac.in",
-        "vnit.ac.in",
-        "nitnagaland.ac.in",
-        "nitp.ac.in",
-        "nitpy.ac.in",
-        "nitrr.ac.in",
-        "nitrkl.ac.in",
-        "nitsikkim.ac.in",
-        "nits.ac.in",
-        "nitsri.net",
-        "nitt.edu",
-        "nituk.ac.in",
-        "nitw.ac.in",
-        "nitdelhi.ac.in",
-        "nitap.ac.in",
+        'mnnit.ac.in',
+        'nitap.ac.in',
+        'manit.ac.in',
+        'nitc.ac.in',
+        'nitdelhi.ac.in',
+        'nitdgp.ac.in',
+        'nitgoa.ac.in',
+        'nith.ac.in',
+        'mnit.ac.in',
+        'nitj.ac.in',
+        'nitjsr.ac.in',
+        'nitk.edu.in',
+        'nitkkr.ac.in',
+        'nitmanipur.ac.in',
+        'nitm.ac.in',
+        'nitmz.ac.in',
+        'vnit.ac.in',
+        'nitnagaland.ac.in',
+        'nitp.ac.in',
+        'nitpy.ac.in',
+        'nitrr.ac.in',
+        'nitrkl.ac.in',
+        'nitsikkim.ac.in',
+        'nits.ac.in',
+        'nitsri.net',
+        'nitt.edu',
+        'nituk.ac.in',
+        'nitw.ac.in',
+        'nitdelhi.ac.in',
+        'nitap.ac.in',
       ];
 
       // const isValid = nitEmailDomains.some((domain) => email.includes(domain));
@@ -114,18 +114,18 @@ export default function Home() {
       // }
 
       setUser(result.user);
-      setError(""); // Clear any previous errors
+      setError(''); // Clear any previous errors
       toast.success(`Welcome, ${result.user.displayName}.`);
     } catch (err) {
-      setError("Login failed. Try again.");
-      toast.error("Login Failed. Try Again!");
+      setError('Login failed. Try again.');
+      toast.error('Login Failed. Try Again!');
     }
   };
 
   const handleLogout = async () => {
     await signOut(auth);
     setUser(null);
-    toast.success("Signed Out Successfully.");
+    toast.success('Signed Out Successfully.');
   };
 
   return (
@@ -136,7 +136,7 @@ export default function Home() {
       }}
     >
       <Toaster
-        position="bottom-center"
+        position="top-center"
         reverseOrder={false}
         toastOptions={{ duration: 3000 }}
       />
@@ -152,8 +152,9 @@ export default function Home() {
             />
           </Link>
           <button
-            className={`${user ? "bg-red-500" : "bg-emerald-600"
-              } m-2 inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl px-4 tracking-wide text-white`}
+            className={`${
+              user ? 'bg-red-500' : 'bg-emerald-600'
+            } m-2 inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl px-4 tracking-wide text-white`}
             onClick={user ? handleLogout : handleGoogleLogin}
           >
             {user ? (
@@ -296,7 +297,7 @@ export default function Home() {
                   Sign In Using College Email
                 </p>
               </button>
-              <button className="z-10 flex cursor-pointer items-center gap-2 rounded-xl border border-emerald-200 bg-gradient-to-b from-emerald-500 via-emerald-600 to-emerald-700 px-4 py-2 font-medium text-white shadow-xl hover:shadow-2xl flex align-center justify-center">
+              <button className="align-center z-10 flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-gradient-to-b from-emerald-500 via-emerald-600 to-emerald-700 px-4 py-2 font-medium text-white shadow-xl hover:shadow-2xl">
                 {/* <svg
                   fill="#ffffff"
                   viewBox="0 0 512 512"
@@ -318,11 +319,14 @@ export default function Home() {
                   </g>
                 </svg> */}
 
-                <p onClick={()=>{ navigate("/nitExclusive")}} className="text-sm tracking-wide text-white text-center">
+                <p
+                  onClick={() => {
+                    navigate('/nitExclusive');
+                  }}
+                  className="text-center text-sm tracking-wide text-white"
+                >
                   Continue as guest
                 </p>
-
-
               </button>
             </div>
           )}
