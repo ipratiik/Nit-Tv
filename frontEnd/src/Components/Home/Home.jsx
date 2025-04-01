@@ -16,14 +16,16 @@ import { LogIn, LogOut } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyBvGzs4QwqRuH7oO-LGuv2NnQEf3mkBWKQ',
-  authDomain: 'inbound-ranger-375215.firebaseapp.com',
-  projectId: 'inbound-ranger-375215',
-  storageBucket: 'inbound-ranger-375215.appspot.com',
-  messagingSenderId: '620360233615',
-  appId: '1:620360233615:web:f10161593a6c9a22bf36fa',
-  measurementId: 'G-LKLV799DLQ',
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
+
+
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -37,13 +39,25 @@ export default function Home() {
   const [user, setUser] = useState(null);
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    toast.success("Please wait while we check for login", {
+      duration: 5000,
+    });
+  }, [])
+
   //  Keep user logged in even after refresh
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (loggedInUser) => {
       if (loggedInUser) {
         setUser(loggedInUser);
+        toast.success("Login found enjoy NIT TV", {
+          duration: 5000,
+        });
       } else {
         setUser(null);
+        toast.error("No Login found, please use gmail to continue", {
+          duration: 5000,
+        });
       }
     });
 
@@ -209,7 +223,7 @@ export default function Home() {
           {user ? (
             <div className="z-10 flex max-w-5xl flex-col items-center gap-4 text-center text-3xl font-bold md:text-7xl">
               <img
-                src={user.photoURL || '/Avatar.png'}
+                src={user.photoURL || '/avatar.png'}
                 alt="Profile"
                 className="size-36 rounded-3xl border-2"
               />
@@ -274,7 +288,7 @@ export default function Home() {
                   Sign In With Google
                 </p>
               </button>
-              <button className="z-10 flex cursor-pointer items-center gap-2 rounded-xl border border-emerald-200 bg-gradient-to-b from-emerald-500 via-emerald-600 to-emerald-700 px-4 py-2 font-medium text-white shadow-xl hover:shadow-2xl">
+              {/* <button className="z-10 flex cursor-pointer items-center gap-2 rounded-xl border border-emerald-200 bg-gradient-to-b from-emerald-500 via-emerald-600 to-emerald-700 px-4 py-2 font-medium text-white shadow-xl hover:shadow-2xl">
                 <svg
                   fill="#ffffff"
                   viewBox="0 0 512 512"
@@ -299,7 +313,7 @@ export default function Home() {
                 <p className="text-sm tracking-wide text-white">
                   Sign In Using OTP
                 </p>
-              </button>
+              </button> */}
             </div>
           )}
         </main>
