@@ -18,23 +18,23 @@ const io = new Server(server, {
     },
 });
 
-let availableUsers = [];
+let availableUsers = new Set();
 
 // Store active rooms (key: roomId, value: array of user socket IDs)
 const rooms = new Map();
 
-let activeUsers=0;
+let activeUsers=0; 
 
 io.on("connection", (socket) => {
     console.log(`User connected: ${socket.id}`);
     activeUsers++;
     socket.on("start", () => {
-        availableUsers.push(socket.id);
+        availableUsers.add(socket.id);
         matchUsers(socket);
     });
 
     setInterval(() => {
-        const numberOfUsers = availableUsers.length + 2*rooms.size;
+        const numberOfUsers = availableUsers.size + 2*rooms.size;
         io.emit("active-users", numberOfUsers);
     }, 10000);
 
@@ -50,7 +50,7 @@ io.on("connection", (socket) => {
     // When a user clicks "Stop", remove them from their room and the available pool
     socket.on("stop", ({ roomId, otherUserID }) => {
         leaveRoom(socket, roomId);
-        availableUsers = availableUsers.filter((id) => id !== socket.id);
+        availableUsers.delete(socket.id)
         io.to(otherUserID).emit("clear-Messages");
         console.log(`User ${socket.id} stopped the stream`);
     });
@@ -95,7 +95,7 @@ io.on("connection", (socket) => {
 
 
     socket.on("disconnect", () => {
-        availableUsers = availableUsers.filter((id) => id !== socket.id);
+        availableUsers.delete(socket.id);
         for (const [roomId, users] of rooms.entries()) {
             if (users.includes(socket.id)) {
                 leaveRoom(socket, roomId);
@@ -106,27 +106,56 @@ io.on("connection", (socket) => {
     });
 });
 
+let isMatching = false;
+
 function matchUsers(socket) {
+    // If already matching, delay this attempt
+    if (isMatching) {
+        setTimeout(() => matchUsers(socket), 100); // Retry after 100ms
+        return;
+    }
 
-    // remove the current user from the available pool
-    availableUsers = availableUsers.filter((id) => id !== socket.id);
+    isMatching = true;
 
-    // finding another user
-    if (availableUsers.length > 0) {
-        const otherUserId = availableUsers.shift();
-        const roomId = `${socket.id}-${otherUserId}`;
+    try {
+        // Remove the current user from the available pool (if present)
+        availableUsers.delete(socket.id);
 
-        rooms.set(roomId, [socket.id, otherUserId]);
-        socket.join(roomId);
-        io.to(otherUserId).emit("join-room", { roomId, from: socket.id, me: otherUserId });
-        socket.emit("join-room", { roomId, from: otherUserId, me: socket.id });
-        console.log(`Matched ${socket.id} with ${otherUserId} in room ${roomId}`);
-    } 
-    else {
-        availableUsers.push(socket.id);
-        socket.emit("waiting", "Waiting for another user...");
+        // Get the first available user from the Set
+        const iterator = availableUsers.values();
+        const { value: otherUserId, done } = iterator.next();
+
+        if (!done) {
+            // Remove the matched user from the pool
+            availableUsers.delete(otherUserId);
+
+            const roomId = `${socket.id}-${otherUserId}`;
+            rooms.set(roomId, [socket.id, otherUserId]);
+
+            // Join both users into the room and emit join-room
+            socket.join(roomId);
+            io.to(otherUserId).emit("join-room", {
+                roomId,
+                from: socket.id,
+                me: otherUserId,
+            });
+            socket.emit("join-room", {
+                roomId,
+                from: otherUserId,
+                me: socket.id,
+            });
+
+            console.log(`Matched ${socket.id} with ${otherUserId} in room ${roomId}`);
+        } else {
+            // No one available — add current user to the pool and notify
+            availableUsers.add(socket.id);
+            socket.emit("waiting", "Waiting for another user...");
+        }
+    } finally {
+        isMatching = false; // Release the lock
     }
 }
+
 
 function leaveRoom(socket, roomId) {
     if (roomId && rooms.has(roomId)) {
