@@ -29,7 +29,7 @@ io.on("connection", (socket) => {
     console.log(`User connected: ${socket.id}`);
     activeUsers++;
     socket.on("start", () => {
-        availableUsers.push(socket.id);
+        availableUsers.add(socket.id);
         matchUsers(socket);
     });
 
