@@ -134,45 +134,37 @@ const Room = () => {
       setWaiting(false);
       setMySocketId(me);
       setOtherUserID(from);
-      peerInstance.current = new PeerService();
 
-      // addinf local stream to the peer connection
-      localStream
-        .getTracks()
-        .forEach((track) =>
-          peerInstance.current.webRTCPeer.addTrack(track, localStream)
-        );
+      // checking the perrInstance
+      if (!peerInstance.current) {
+        peerInstance.current = new PeerService();
+      }
 
-      // listening for remote stream
-      peerInstance.current.webRTCPeer.ontrack = (event) => {
-        // console.log("Received remote stream:", event.streams[0]);
+      const peer = peerInstance.current.webRTCPeer;
+
+      // Attach local stream
+      localStream.getTracks().forEach((track) => {
+        peer.addTrack(track, localStream);
+      });
+
+      // Listen for remote stream
+      peer.ontrack = (event) => {
         setRemoteStream(event.streams[0]);
       };
 
-      // log connection state changes
-      peerInstance.current.webRTCPeer.onconnectionstatechange = () => {
-        // console.log(
-        //   "Connection state:",
-        //   peerInstance.current.webRTCPeer.connectionState
-        // );
+      // Log connection state
+      peer.onconnectionstatechange = () => {
+        // I will log here later
       };
 
-      // Log ICE connection state changes
-      peerInstance.current.webRTCPeer.oniceconnectionstatechange = () => {
-        // console.log(
-        //   "ICE connection state:",
-        //   peerInstance.current.webRTCPeer.iceConnectionState
-        // );
-
-        if (peerInstance.current.webRTCPeer.iceConnectionState === "failed") {
+      peer.oniceconnectionstatechange = () => {
+        if (peer.iceConnectionState === "failed") {
           toast.error("Connection Failed. Click Next!");
         }
       };
 
-      // Handle ICE candidates
-      peerInstance.current.webRTCPeer.onicecandidate = (event) => {
+      peer.onicecandidate = (event) => {
         if (event.candidate) {
-          // console.log("Sending ICE candidate");
           socket.emit("ice-candidate", {
             candidate: event.candidate,
             to: from,
@@ -180,14 +172,19 @@ const Room = () => {
         }
       };
 
-      // Decide which peer creates the offer based on socket IDs
+      // SAFETY CHECK — Only make offer if signaling state is stable
       if (socket.id < from) {
-        // This peer creates the offer
-        // console.log("This peer is the offerer");
+        // this is done to prevent the whie screen error 
+        if (peer.signalingState !== "stable") {
+          console.warn("Peer not in stable state, skipping offer creation.");
+          return;
+        }
+
         const offer = await peerInstance.current.getOffer();
         socket.emit("offer", { offer, roomId, to: from });
       }
     });
+
 
     // Receive an offer
     socket.on("offer", async ({ offer, from, roomId }) => {
@@ -336,11 +333,11 @@ const Room = () => {
       setIsTyping(false);
     })
 
-    socket.on("audio-muted", ()=>{
+    socket.on("audio-muted", () => {
       toast.error("Other user muted audio");
     })
 
-    socket.on("video-muted", ()=>{
+    socket.on("video-muted", () => {
       toast.error("Other user muted video");
     })
 
@@ -417,9 +414,9 @@ const Room = () => {
         toast.success(
           audioTrack.enabled ? "Microphone Unmuted." : "Microphone Muted."
         );
-        if(!audioTrack.enabled){
-          socket.emit("audio-muted", {roomId, otherUserID});
-        } 
+        if (!audioTrack.enabled) {
+          socket.emit("audio-muted", { roomId, otherUserID });
+        }
       }
     }
   };
@@ -432,9 +429,9 @@ const Room = () => {
         videoTrack.enabled = !videoTrack.enabled;
         setVideoEnabled(videoTrack.enabled);
         toast.success(videoTrack.enabled ? "Camera On." : "Camera Off.");
-        if(!videoTrack.enabled){
-          socket.emit("video-muted", {roomId, otherUserID});
-        } 
+        if (!videoTrack.enabled) {
+          socket.emit("video-muted", { roomId, otherUserID });
+        }
       }
     }
   };

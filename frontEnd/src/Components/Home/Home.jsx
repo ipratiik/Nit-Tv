@@ -296,7 +296,7 @@ export default function Home() {
                   Sign In Using College Email
                 </p>
               </button>
-              <button className="z-10 flex cursor-pointer items-center gap-2 rounded-xl border border-emerald-200 bg-gradient-to-b from-emerald-500 via-emerald-600 to-emerald-700 px-4 py-2 font-medium text-white shadow-xl hover:shadow-2xl flex align-center justify-center">
+              <button className="z-10 cursor-pointer items-center gap-2 rounded-xl border border-emerald-200 bg-gradient-to-b from-emerald-500 via-emerald-600 to-emerald-700 px-4 py-2 font-medium text-white shadow-xl hover:shadow-2xl flex align-center justify-center">
                 {/* <svg
                   fill="#ffffff"
                   viewBox="0 0 512 512"
