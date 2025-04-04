@@ -62,8 +62,7 @@ const Room = () => {
         });
         // console.log("Local stream initialized:", stream);
         setLocalStream(stream);
-      }
-      catch (error) {
+      } catch (error) {
         // console.error(
         //   "Error accessing media devices:",
         //   error.name,
@@ -330,19 +329,19 @@ const Room = () => {
     socket.on("user-typing", () => {
       console.log("user is typing broooooo op");
       setIsTyping(true);
-    })
+    });
     socket.on("stop-typing", () => {
       console.log("user is not broooooo op");
       setIsTyping(false);
-    })
+    });
 
-    socket.on("audio-muted", ()=>{
+    socket.on("audio-muted", () => {
       toast.error("Other user muted audio");
-    })
+    });
 
-    socket.on("video-muted", ()=>{
+    socket.on("video-muted", () => {
       toast.error("Other user muted video");
-    })
+    });
 
     // Cleanup socket listeners on unmount
     return () => {
@@ -374,8 +373,8 @@ const Room = () => {
       remoteVideoRef.current.srcObject = null;
     }
     setMessageArray([]);
-    
-    console.log("next is clicked : ", roomId, " otheruser ID is ",otherUserID);
+
+    console.log("next is clicked : ", roomId, " otheruser ID is ", otherUserID);
     await socket.emit("next", { roomId, otherUserID });
     setRoomId(null);
     toast.success("Finding Next User!");
@@ -398,16 +397,15 @@ const Room = () => {
     toast.success("Stopped Successfully.");
   };
 
-
   const handleChatBlur = () => {
     console.log("bluring");
     socket.emit("stop-typing", { roomId, otherUserID });
-  }
+  };
 
   const handleChatFocus = () => {
     console.log("focusing");
     socket.emit("user-typing", { roomId, otherUserID });
-  }
+  };
 
   // Toggle audio
   const toggleAudio = () => {
@@ -419,9 +417,9 @@ const Room = () => {
         toast.success(
           audioTrack.enabled ? "Microphone Unmuted." : "Microphone Muted."
         );
-        if(!audioTrack.enabled){
-          socket.emit("audio-muted", {roomId, otherUserID});
-        } 
+        if (!audioTrack.enabled) {
+          socket.emit("audio-muted", { roomId, otherUserID });
+        }
       }
     }
   };
@@ -434,9 +432,9 @@ const Room = () => {
         videoTrack.enabled = !videoTrack.enabled;
         setVideoEnabled(videoTrack.enabled);
         toast.success(videoTrack.enabled ? "Camera On." : "Camera Off.");
-        if(!videoTrack.enabled){
-          socket.emit("video-muted", {roomId, otherUserID});
-        } 
+        if (!videoTrack.enabled) {
+          socket.emit("video-muted", { roomId, otherUserID });
+        }
       }
     }
   };
@@ -500,15 +498,17 @@ const Room = () => {
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 z-10">
                   <button
                     onClick={toggleAudio}
-                    className={`rounded-full p-2 ${audioEnabled ? "bg-green-500" : "bg-red-500"
-                      } text-white cursor-pointer`}
+                    className={`rounded-full p-2 ${
+                      audioEnabled ? "bg-green-500" : "bg-red-500"
+                    } text-white cursor-pointer`}
                   >
                     {audioEnabled ? <Mic size={20} /> : <MicOff size={20} />}
                   </button>
                   <button
                     onClick={toggleVideo}
-                    className={`rounded-full p-2 ${videoEnabled ? "bg-green-500" : "bg-red-500"
-                      } text-white cursor-pointer`}
+                    className={`rounded-full p-2 ${
+                      videoEnabled ? "bg-green-500" : "bg-red-500"
+                    } text-white cursor-pointer`}
                   >
                     {videoEnabled ? (
                       <Video size={20} />
@@ -608,7 +608,9 @@ const Room = () => {
             {/* Chat Input */}
             <div className="flex items-center gap-2 md:gap-4 mt-4">
               <input
-                onChange={(e) => { setMessage(e.target.value) }}
+                onChange={(e) => {
+                  setMessage(e.target.value);
+                }}
                 type="text"
                 placeholder="Type Message..."
                 onKeyDown={handleKeyPress}
@@ -627,44 +629,45 @@ const Room = () => {
           </div>
 
           {/* Chat Messages */}
-          <div
-            ref={chatContainerRef}
-            className="h-44 max-h-44 overflow-y-auto rounded-lg border-2 border-gray-400 bg-gray-100 p-4 shadow-xl"
-            style={{ position: "relative" }}
-          >
-            <b style={{ display: isTyping ? 'inline' : 'none', position: "absolute", top: "-2%", right: "60%", left: "43%", }}>
-              typing...
-            </b>
-            <div className="flex flex-col gap-2">
-              {messageArray.length === 0 && (
-                <>
-                  <p className="text-center text-gray-500 italic font-extralight">
+          <div className="relative h-44 max-h-44 rounded-lg border-2 border-gray-400 bg-gray-100 p-4 shadow-xl">
+            {/* Scrollable Messages */}
+            <div ref={chatContainerRef} className="h-full overflow-y-auto">
+              <div className="flex flex-col gap-2">
+                {messageArray.length === 0 && (
+                  <p className="text-center font-extralight text-gray-500 italic">
                     No Messages Yet.
                   </p>
-                </>
-              )}
-              {messageArray.map(({ message, mySocketId }, index) =>
-                mySocketID === mySocketId ? (
-                  <div key={index} className="flex flex-col items-end">
-                    <div className="max-w-3/4 rounded-2xl rounded-br-none bg-gradient-to-r from-teal-400 to-emerald-500 px-4 py-3 shadow-md">
-                      <p className="text-white text-sm">{message}</p>
+                )}
+                {messageArray.map(({ message, mySocketId }, index) =>
+                  mySocketID === mySocketId ? (
+                    <div key={index} className="flex flex-col items-end">
+                      <div className="max-w-3/4 rounded-2xl rounded-br-none bg-gradient-to-r from-teal-400 to-emerald-500 px-4 py-3 shadow-md">
+                        <p className="text-sm text-white">{message}</p>
+                      </div>
+                      <span className="mt-1 pr-2 text-xs text-emerald-600">
+                        You
+                      </span>
                     </div>
-                    <span className="text-xs text-emerald-600 mt-1 pr-2">
-                      You
-                    </span>
-                  </div>
-                ) : (
-                  <div key={index} className="flex flex-col items-start">
-                    <div className="max-w-3/4 rounded-2xl rounded-bl-none bg-gradient-to-r from-amber-300 to-orange-300 px-4 py-3 shadow-md">
-                      <p className="text-gray-800 text-sm">{message}</p>
+                  ) : (
+                    <div key={index} className="flex flex-col items-start">
+                      <div className="max-w-3/4 rounded-2xl rounded-bl-none bg-gradient-to-r from-amber-300 to-orange-300 px-4 py-3 shadow-md">
+                        <p className="text-sm text-gray-800">{message}</p>
+                      </div>
+                      <span className="mt-1 pl-2 text-xs text-amber-600">
+                        Other
+                      </span>
                     </div>
-                    <span className="text-xs text-amber-600 mt-1 pl-2">
-                      Other
-                    </span>
-                  </div>
-                )
-              )}
+                  )
+                )}
+              </div>
             </div>
+
+            {/* Typing Indicator */}
+            {isTyping && (
+              <b className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform rounded-md bg-gray-200 px-2 py-1 text-gray-500 shadow-md">
+                Typing...
+              </b>
+            )}
           </div>
         </div>
       </div>
