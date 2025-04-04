@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { initializeApp } from "firebase/app";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { initializeApp } from 'firebase/app';
+import { useNavigate } from 'react-router-dom';
 import {
   getAuth,
   GoogleAuthProvider,
@@ -11,11 +11,11 @@ import {
   setPersistence,
   browserLocalPersistence,
   updateProfile,
-} from "firebase/auth";
+} from 'firebase/auth';
 
-import { LogIn, LogOut } from "lucide-react";
-import { Toaster, toast } from "react-hot-toast";
-import avatarIMG from "../../../public/avatar.png";
+import { LogIn, LogOut } from 'lucide-react';
+import { Toaster, toast } from 'react-hot-toast';
+import avatarIMG from '/avatar.png';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -37,12 +37,12 @@ setPersistence(auth, browserLocalPersistence).catch(console.error);
 
 export default function Home() {
   const [user, setUser] = useState(null);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    toast.success("Checking For Login!", {
+    toast.success('Checking For Login!', {
       duration: 1000,
     });
   }, []);
@@ -52,12 +52,12 @@ export default function Home() {
     const unsubscribe = onAuthStateChanged(auth, (loggedInUser) => {
       if (loggedInUser) {
         setUser(loggedInUser);
-        toast.success("Login Found.", {
+        toast.success('Login Found.', {
           duration: 2000,
         });
       } else {
         setUser(null);
-        toast.error("No Login Found. Please Login!", {
+        toast.error('No Login Found. Please Login!', {
           duration: 2000,
         });
       }
@@ -73,36 +73,36 @@ export default function Home() {
 
       // Restrict login to students not from NITs
       const nitEmailDomains = [
-        "mnnit.ac.in",
-        "nitap.ac.in",
-        "manit.ac.in",
-        "nitc.ac.in",
-        "nitdelhi.ac.in",
-        "nitdgp.ac.in",
-        "nitgoa.ac.in",
-        "nith.ac.in",
-        "mnit.ac.in",
-        "nitj.ac.in",
-        "nitjsr.ac.in",
-        "nitk.edu.in",
-        "nitkkr.ac.in",
-        "nitmanipur.ac.in",
-        "nitm.ac.in",
-        "nitmz.ac.in",
-        "vnit.ac.in",
-        "nitnagaland.ac.in",
-        "nitp.ac.in",
-        "nitpy.ac.in",
-        "nitrr.ac.in",
-        "nitrkl.ac.in",
-        "nitsikkim.ac.in",
-        "nits.ac.in",
-        "nitsri.net",
-        "nitt.edu",
-        "nituk.ac.in",
-        "nitw.ac.in",
-        "nitdelhi.ac.in",
-        "nitap.ac.in",
+        'mnnit.ac.in',
+        'nitap.ac.in',
+        'manit.ac.in',
+        'nitc.ac.in',
+        'nitdelhi.ac.in',
+        'nitdgp.ac.in',
+        'nitgoa.ac.in',
+        'nith.ac.in',
+        'mnit.ac.in',
+        'nitj.ac.in',
+        'nitjsr.ac.in',
+        'nitk.edu.in',
+        'nitkkr.ac.in',
+        'nitmanipur.ac.in',
+        'nitm.ac.in',
+        'nitmz.ac.in',
+        'vnit.ac.in',
+        'nitnagaland.ac.in',
+        'nitp.ac.in',
+        'nitpy.ac.in',
+        'nitrr.ac.in',
+        'nitrkl.ac.in',
+        'nitsikkim.ac.in',
+        'nits.ac.in',
+        'nitsri.net',
+        'nitt.edu',
+        'nituk.ac.in',
+        'nitw.ac.in',
+        'nitdelhi.ac.in',
+        'nitap.ac.in',
       ];
 
       // const isValid = nitEmailDomains.some((domain) => email.includes(domain));
@@ -114,18 +114,18 @@ export default function Home() {
       // }
 
       setUser(result.user);
-      setError(""); // Clear any previous errors
+      setError(''); // Clear any previous errors
       toast.success(`Welcome, ${result.user.displayName}.`);
     } catch (err) {
-      setError("Login failed. Try again.");
-      toast.error("Login Failed. Try Again!");
+      setError('Login failed. Try again.');
+      toast.error('Login Failed. Try Again!');
     }
   };
 
   const handleLogout = async () => {
     await signOut(auth);
     setUser(null);
-    toast.success("Signed Out Successfully.");
+    toast.success('Signed Out Successfully.');
   };
 
   return (
@@ -136,7 +136,7 @@ export default function Home() {
       }}
     >
       <Toaster
-        position="bottom-center"
+        position="top-center"
         reverseOrder={false}
         toastOptions={{ duration: 3000 }}
       />
@@ -152,8 +152,9 @@ export default function Home() {
             />
           </Link>
           <button
-            className={`${user ? "bg-red-500" : "bg-emerald-600"
-              } m-2 inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl px-4 tracking-wide text-white`}
+            className={`${
+              user ? 'bg-red-500' : 'bg-emerald-600'
+            } m-2 inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl px-4 tracking-wide text-white`}
             onClick={user ? handleLogout : handleGoogleLogin}
           >
             {user ? (
@@ -296,33 +297,30 @@ export default function Home() {
                   Sign In Using College Email
                 </p>
               </button>
+<<<<<<< HEAD
               <button className="z-10 cursor-pointer items-center gap-2 rounded-xl border border-emerald-200 bg-gradient-to-b from-emerald-500 via-emerald-600 to-emerald-700 px-4 py-2 font-medium text-white shadow-xl hover:shadow-2xl flex align-center justify-center">
                 {/* <svg
+=======
+              <button className="align-center z-10 flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-gradient-to-b from-emerald-500 via-emerald-600 to-emerald-700 px-4 py-2 font-medium text-white shadow-xl hover:shadow-2xl">
+                <svg
+>>>>>>> 4d32ff5ac66b672706c1382c16ab78c11ea0404f
                   fill="#ffffff"
-                  viewBox="0 0 512 512"
+                  viewBox="0 0 32 32"
                   xmlns="http://www.w3.org/2000/svg"
                   stroke="#ffffff"
                   height={20}
                   width={20}
                 >
-                  <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
-                  <g
-                    id="SVGRepo_tracerCarrier"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  ></g>
-                  <g id="SVGRepo_iconCarrier">
-                    <g id="OTP">
-                      <path d="M458.4741,112H265V62.41A31.3815,31.3815,0,0,0,233.5879,31H62.4077A31.3806,31.3806,0,0,0,31,62.41V449.59A31.4379,31.4379,0,0,0,62.4077,481h171.18A31.4388,31.4388,0,0,0,265,449.59V292H458.4771A22.5231,22.5231,0,0,0,481,269.4771V134.5259A22.5257,22.5257,0,0,0,458.4741,112ZM125.5,50.08h45a11.25,11.25,0,0,1,0,22.5h-45a11.25,11.25,0,0,1,0-22.5Zm44.9956,411.7651h-45a11.25,11.25,0,1,1,0-22.5h45a11.25,11.25,0,0,1,0,22.5ZM245.1982,420.25H50.7974V91.75H245.1982V112H125.3149A22.3149,22.3149,0,0,0,103,134.3149V269.6641A22.3357,22.3357,0,0,0,125.3359,292H166v36.1489a11.1221,11.1221,0,0,0,18.9868,7.8643L229,292h16.1982Zm-24.39-210.06a11.3086,11.3086,0,0,1,4.14,15.39,11.198,11.198,0,0,1-15.39,4.14L195.25,221.44V238a11.25,11.25,0,0,1-22.5,0V221.44L158.437,229.72a11.198,11.198,0,0,1-15.39-4.14,11.3164,11.3164,0,0,1,4.14-15.39L161.5,202l-14.313-8.28a11.2689,11.2689,0,0,1,11.25-19.5293L172.75,182.47V166a11.25,11.25,0,0,1,22.5,0v16.47l14.3086-8.2793a11.2689,11.2689,0,0,1,11.25,19.5293L206.5,202Zm108,0a11.3086,11.3086,0,0,1,4.14,15.39,11.198,11.198,0,0,1-15.39,4.14L303.25,221.44V238a11.25,11.25,0,0,1-22.5,0V221.44L266.437,229.72a11.198,11.198,0,0,1-15.39-4.14,11.3164,11.3164,0,0,1,4.14-15.39L269.5,202l-14.313-8.28a11.2689,11.2689,0,0,1,11.25-19.5293L280.75,182.47V166a11.25,11.25,0,0,1,22.5,0v16.47l14.3086-8.2793a11.2689,11.2689,0,0,1,11.25,19.5293L314.5,202Zm108,0a11.3086,11.3086,0,0,1,4.14,15.39,11.198,11.198,0,0,1-15.39,4.14L411.25,221.44V238a11.25,11.25,0,0,1-22.5,0V221.44L374.437,229.72a11.198,11.198,0,0,1-15.39-4.14,11.3164,11.3164,0,0,1,4.14-15.39L377.5,202l-14.313-8.28a11.2689,11.2689,0,0,1,11.25-19.5293L388.75,182.47V166a11.25,11.25,0,0,1,22.5,0v16.47l14.3086-8.2793a11.2689,11.2689,0,0,1,11.25,19.5293L422.5,202Z"></path>{' '}
-                    </g>
-                  </g>
-                </svg> */}
-
-                <p onClick={()=>{ navigate("/nitExclusive")}} className="text-sm tracking-wide text-white text-center">
-                  Continue as guest
+                  <path d="M16 15.503A5.041 5.041 0 1 0 16 5.42a5.041 5.041 0 0 0 0 10.083zm0 2.215c-6.703 0-11 3.699-11 5.5v3.363h22v-3.363c0-2.178-4.068-5.5-11-5.5z"></path>
+                </svg>
+                <p
+                  onClick={() => {
+                    navigate('/nitExclusive');
+                  }}
+                  className="text-sm tracking-wide text-white"
+                >
+                  Continue As Guest
                 </p>
-
-
               </button>
             </div>
           )}
