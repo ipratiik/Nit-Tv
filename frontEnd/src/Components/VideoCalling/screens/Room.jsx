@@ -134,19 +134,10 @@ const Room = () => {
       setMySocketId(me);
       setOtherUserID(from);
 
-<<<<<<< HEAD
       // checking the perrInstance
       if (!peerInstance.current) {
         peerInstance.current = new PeerService();
       }
-=======
-      // addinf local stream to the peer connection
-      localStream
-        .getTracks()
-        .forEach((track) =>
-          peerInstance.current.webRTCPeer.addTrack(track, localStream),
-        );
->>>>>>> 4d32ff5ac66b672706c1382c16ab78c11ea0404f
 
       const peer = peerInstance.current.webRTCPeer;
 
@@ -165,32 +156,15 @@ const Room = () => {
         // I will log here later
       };
 
-<<<<<<< HEAD
       peer.oniceconnectionstatechange = () => {
         if (peer.iceConnectionState === "failed") {
           toast.error("Connection Failed. Click Next!");
-=======
-      // Log ICE connection state changes
-      peerInstance.current.webRTCPeer.oniceconnectionstatechange = () => {
-        // console.log(
-        //   "ICE connection state:",
-        //   peerInstance.current.webRTCPeer.iceConnectionState
-        // );
-
-        if (peerInstance.current.webRTCPeer.iceConnectionState === 'failed') {
-          toast.error('Connection Failed. Click Next!');
->>>>>>> 4d32ff5ac66b672706c1382c16ab78c11ea0404f
         }
       };
 
       peer.onicecandidate = (event) => {
         if (event.candidate) {
-<<<<<<< HEAD
           socket.emit("ice-candidate", {
-=======
-          // console.log("Sending ICE candidate");
-          socket.emit('ice-candidate', {
->>>>>>> 4d32ff5ac66b672706c1382c16ab78c11ea0404f
             candidate: event.candidate,
             to: from,
           });
@@ -356,7 +330,6 @@ const Room = () => {
       setIsTyping(false);
     });
 
-<<<<<<< HEAD
     socket.on("audio-muted", () => {
       toast.error("Other user muted audio");
     })
@@ -364,15 +337,6 @@ const Room = () => {
     socket.on("video-muted", () => {
       toast.error("Other user muted video");
     })
-=======
-    socket.on('audio-muted', () => {
-      toast.error('User Muted Audio.');
-    });
-
-    socket.on('video-muted', () => {
-      toast.error('User Turned Off Video.');
-    });
->>>>>>> 4d32ff5ac66b672706c1382c16ab78c11ea0404f
 
     // Cleanup socket listeners on unmount
     return () => {
@@ -447,11 +411,7 @@ const Room = () => {
           audioTrack.enabled ? 'Microphone Unmuted.' : 'Microphone Muted.',
         );
         if (!audioTrack.enabled) {
-<<<<<<< HEAD
           socket.emit("audio-muted", { roomId, otherUserID });
-=======
-          socket.emit('audio-muted', { roomId, otherUserID });
->>>>>>> 4d32ff5ac66b672706c1382c16ab78c11ea0404f
         }
       }
     }
@@ -464,15 +424,9 @@ const Room = () => {
       if (videoTrack) {
         videoTrack.enabled = !videoTrack.enabled;
         setVideoEnabled(videoTrack.enabled);
-<<<<<<< HEAD
         toast.success(videoTrack.enabled ? "Camera On." : "Camera Off.");
         if (!videoTrack.enabled) {
           socket.emit("video-muted", { roomId, otherUserID });
-=======
-        toast.success(videoTrack.enabled ? 'Camera On.' : 'Camera Off.');
-        if (!videoTrack.enabled) {
-          socket.emit('video-muted', { roomId, otherUserID });
->>>>>>> 4d32ff5ac66b672706c1382c16ab78c11ea0404f
         }
       }
     }
