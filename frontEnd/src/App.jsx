@@ -15,7 +15,7 @@ function App() {
             path="/"
             element={isUnderMaintenance ? <Maintenance /> : <Home />}
           />
-          <Route path="/nitExclusive" element={<Room />} />
+          <Route path="/nitExclusive" element={isUnderMaintenance ? <Maintenance /> : <Room />} />
         </Routes>
       </BrowserRouter>
     </SocketProvider>
