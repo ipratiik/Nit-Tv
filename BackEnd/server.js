@@ -13,28 +13,28 @@ app.get("/", (req, response) => {
 
 const io = new Server(server, {
     cors: {
-        origin: ["http://localhost:5173", "https://manitv.vercel.app", "https://manitv.live", "https://nittv.vercel.app", "https://nittv.live", "https://nittvtest.vercel.app"],
+        origin: ["http://localhost:5173", "https://manitv.vercel.app", "https://manitv.live", "https://nittv.vercel.app", "https://nittv.live",  "https://nittvtest.vercel.app" ],
         methods: ["GET", "POST"],
     },
 });
 
-let availableUsers = new Set();
+let availableUsers = [];
 
 // Store active rooms (key: roomId, value: array of user socket IDs)
 const rooms = new Map();
 
-let activeUsers = 0;
+let activeUsers=0;
 
 io.on("connection", (socket) => {
     console.log(`User connected: ${socket.id}`);
     activeUsers++;
     socket.on("start", () => {
-        availableUsers.add(socket.id);
+        availableUsers.push(socket.id);
         matchUsers(socket);
     });
 
     setInterval(() => {
-        const numberOfUsers = availableUsers.size + 2 * rooms.size;
+        const numberOfUsers = availableUsers.length + 2*rooms.size;
         io.emit("active-users", numberOfUsers);
     }, 10000);
 
@@ -50,7 +50,7 @@ io.on("connection", (socket) => {
     // When a user clicks "Stop", remove them from their room and the available pool
     socket.on("stop", ({ roomId, otherUserID }) => {
         leaveRoom(socket, roomId);
-        availableUsers.delete(socket.id)
+        availableUsers = availableUsers.filter((id) => id !== socket.id);
         io.to(otherUserID).emit("clear-Messages");
         console.log(`User ${socket.id} stopped the stream`);
     });
@@ -75,27 +75,27 @@ io.on("connection", (socket) => {
         io.to(otherUserId).emit("chat-message", { roomId, message, mySocketID });
     });
 
-    socket.on("user-typing", ({ roomId, otherUserID }) => {
+    socket.on("user-typing", ({roomId, otherUserID}) => {
         io.to(otherUserID).emit("user-typing");
         console.log("use is typingr");
     })
-    socket.on("stop-typing", ({ roomId, otherUserID }) => {
+    socket.on("stop-typing", ({roomId, otherUserID}) => {
         io.to(otherUserID).emit("stop-typing");
         console.log("use is stopping typing");
     })
 
 
-    socket.on("audio-muted", ({ roomId, otherUserID }) => {
+    socket.on("audio-muted", ({roomId, otherUserID})=>{
         io.to(otherUserID).emit("audio-muted");
     })
 
-    socket.on("video-muted", ({ roomId, otherUserID }) => {
+    socket.on("video-muted", ({roomId, otherUserID})=>{
         io.to(otherUserID).emit("video-muted");
     })
 
 
     socket.on("disconnect", () => {
-        availableUsers.delete(socket.id)
+        availableUsers = availableUsers.filter((id) => id !== socket.id);
         for (const [roomId, users] of rooms.entries()) {
             if (users.includes(socket.id)) {
                 leaveRoom(socket, roomId);
@@ -106,36 +106,14 @@ io.on("connection", (socket) => {
     });
 });
 
-
-
-let isMatching = false;
-
 function matchUsers(socket) {
-    if (isMatching) {
-        // If already matching someone, retry after a small delay
-        setTimeout(() => matchUsers(socket), 10);
-        return;
-    }
 
-    isMatching = true;
+    // remove the current user from the available pool
+    availableUsers = availableUsers.filter((id) => id !== socket.id);
 
-    if (!availableUsers.has(socket.id)) {
-        isMatching = false;
-        return;
-    }
-
-    availableUsers.delete(socket.id);
-
-    // Find another available user
-    let otherUserId = null;
-    for (const user of availableUsers) {
-        otherUserId = user;
-        break;
-    }
-
-    if (otherUserId) {
-        availableUsers.delete(otherUserId);
-
+    // finding another user
+    if (availableUsers.length > 0) {
+        const otherUserId = availableUsers.shift();
         const roomId = `${socket.id}-${otherUserId}`;
 
         rooms.set(roomId, [socket.id, otherUserId]);
@@ -143,14 +121,12 @@ function matchUsers(socket) {
         io.to(otherUserId).emit("join-room", { roomId, from: socket.id, me: otherUserId });
         socket.emit("join-room", { roomId, from: otherUserId, me: socket.id });
         console.log(`Matched ${socket.id} with ${otherUserId} in room ${roomId}`);
-    } else {
-        availableUsers.add(socket.id); // Add back if no match found
+    } 
+    else {
+        availableUsers.push(socket.id);
         socket.emit("waiting", "Waiting for another user...");
     }
-
-    isMatching = false;
 }
-
 
 function leaveRoom(socket, roomId) {
     if (roomId && rooms.has(roomId)) {
