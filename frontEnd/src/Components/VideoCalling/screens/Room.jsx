@@ -60,20 +60,20 @@ const Room = () => {
           video: true,
           audio: true,
         });
-        // console.log("Local stream initialized:", stream);
+        console.log("Local stream initialized:", stream);
         setLocalStream(stream);
       } catch (error) {
-        // console.error(
-        //   "Error accessing media devices:",
-        //   error.name,
-        //   error.message
-        // );
+        console.error(
+          "Error accessing media devices:",
+          error.name,
+          error.message
+        );
         if (error.name === 'NotAllowedError') {
           toast.error('Camera/Mic Permission Denied.');
-          // console.warn("Permissions denied for camera/microphone.");
+          console.warn("Permissions denied for camera/microphone.");
         } else if (error.name === 'NotFoundError') {
           toast.error('No Camera/Mic Found.');
-          // console.warn("No camera/microphone found.");
+          console.warn("No camera/microphone found.");
         }
       }
     };
@@ -81,7 +81,7 @@ const Room = () => {
 
     return () => {
       if (localStream) {
-        // console.log("cleaning up local stream");
+        console.log("cleaning up local stream");
         localStream.getTracks().forEach((track) => track.stop());
       }
     };
@@ -90,7 +90,7 @@ const Room = () => {
   // seting local video stream to video element
   useEffect(() => {
     if (localStream && localVideoRef.current) {
-      // console.log("Assigning local stream to video element");
+      console.log("Assigning local stream to video element");
       localVideoRef.current.srcObject = localStream;
     }
   }, [localStream]);
@@ -99,7 +99,7 @@ const Room = () => {
   useEffect(() => {
     if (!localStream || !peerInstance.current) return;
 
-    // console.log("Adding tracks to peer connection");
+    console.log("Adding tracks to peer connection");
     localStream
       .getTracks()
       .forEach((track) =>
@@ -111,7 +111,7 @@ const Room = () => {
   useEffect(() => {
     if (remoteStream && remoteVideoRef.current) {
       remoteVideoRef.current.srcObject = remoteStream;
-      // console.log("Remote stream set on video element via useEffect");
+      console.log("Remote stream set on video element via useEffect");
     }
   }, [remoteStream]);
 
@@ -187,7 +187,7 @@ const Room = () => {
 
     // Receive an offer
     socket.on('offer', async ({ offer, from, roomId }) => {
-      // console.log(`Received offer from ${from} in room ${roomId}`);
+      console.log(`Received offer from ${from} in room ${roomId}`);
       setRoomId(roomId);
       setWaiting(false);
 
@@ -204,24 +204,24 @@ const Room = () => {
 
         // Listen for remote stream
         peerInstance.current.webRTCPeer.ontrack = (event) => {
-          // console.log("Received remote stream:", event.streams[0]);
+          console.log("Received remote stream:", event.streams[0]);
           setRemoteStream(event.streams[0]);
         };
 
         // Log connection state changes
         peerInstance.current.webRTCPeer.onconnectionstatechange = () => {
-          // console.log(
-          //   "Connection state:",
-          //   peerInstance.current.webRTCPeer.connectionState
-          // );
+          console.log(
+            "Connection state:",
+            peerInstance.current.webRTCPeer.connectionState
+          );
         };
 
         // Log ICE connection state changes
         peerInstance.current.webRTCPeer.oniceconnectionstatechange = () => {
-          // console.log(
-          //   "ICE connection state:",
-          //   peerInstance.current.webRTCPeer.iceConnectionState
-          // );
+          console.log(
+            "ICE connection state:",
+            peerInstance.current.webRTCPeer.iceConnectionState
+          );
 
           if (peerInstance.current.webRTCPeer.iceConnectionState === 'failed') {
             toast.error('Connection Failed. Click Next!');
@@ -231,7 +231,7 @@ const Room = () => {
         // Handle ICE candidates
         peerInstance.current.webRTCPeer.onicecandidate = (event) => {
           if (event.candidate) {
-            // console.log("Sending ICE candidate");
+            console.log("Sending ICE candidate");
             socket.emit('ice-candidate', {
               candidate: event.candidate,
               to: from,
@@ -252,7 +252,7 @@ const Room = () => {
 
     // Receive an answer
     socket.on('answer', async ({ answer }) => {
-      // console.log("Received answer");
+      console.log("Received answer");
       if (
         peerInstance.current &&
         peerInstance.current.webRTCPeer.signalingState === 'have-local-offer'
@@ -260,7 +260,7 @@ const Room = () => {
         try {
           await peerInstance.current.setRemoteDescription(answer);
         } catch (error) {
-          // console.error("Error setting remote answer:", error);
+          console.error("Error setting remote answer:", error);
           toast.error('Connection Failed. Click Next!');
         }
       } else {
@@ -273,21 +273,21 @@ const Room = () => {
 
     // Receive an ICE candidate
     socket.on('ice-candidate', async ({ candidate }) => {
-      // console.log("Received ICE candidate");
+      console.log("Received ICE candidate");
       if (peerInstance.current) {
         try {
           await peerInstance.current.webRTCPeer.addIceCandidate(
             new RTCIceCandidate(candidate),
           );
         } catch (error) {
-          // console.error("Error adding ICE candidate:", error);
+          console.error("Error adding ICE candidate:", error);
         }
       }
     });
 
     // When the other user leaves
     socket.on('user-left', () => {
-      // console.log("Other user left the room");
+      console.log("Other user left the room");
       toast.success('User Left. Click Next!');
       setRemoteStream(null);
       setRoomId(null);

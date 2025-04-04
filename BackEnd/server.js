@@ -29,7 +29,7 @@ io.on("connection", (socket) => {
     console.log(`User connected: ${socket.id}`);
     activeUsers++;
     socket.on("start", () => {
-        availableUsers.add(socket.id);
+        availableUsers.push(socket.id);
         matchUsers(socket);
     });
 
@@ -50,7 +50,7 @@ io.on("connection", (socket) => {
     // When a user clicks "Stop", remove them from their room and the available pool
     socket.on("stop", ({ roomId, otherUserID }) => {
         leaveRoom(socket, roomId);
-        availableUsers.delete(socket.id);
+        availableUsers.delete(socket.id)
         io.to(otherUserID).emit("clear-Messages");
         console.log(`User ${socket.id} stopped the stream`);
     });
@@ -95,8 +95,7 @@ io.on("connection", (socket) => {
 
 
     socket.on("disconnect", () => {
-        // delete the user from the avalaible pool
-        availableUsers.delete(socket.id);
+        availableUsers.delete(socket.id)
         for (const [roomId, users] of rooms.entries()) {
             if (users.includes(socket.id)) {
                 leaveRoom(socket, roomId);
@@ -108,32 +107,32 @@ io.on("connection", (socket) => {
 });
 
 
+
 let isMatching = false;
 
 function matchUsers(socket) {
-
-    // since js dont have threads or mutex can i use a simple lock
     if (isMatching) {
+        // If already matching someone, retry after a small delay
         setTimeout(() => matchUsers(socket), 10);
         return;
     }
 
     isMatching = true;
 
-    if (!availableUsers.has(socket.id)) return;
+    if (!availableUsers.has(socket.id)) {
+        isMatching = false;
+        return;
+    }
 
-    // remove the current user from the available pool
-    // i am using set to prevent duplicate
     availableUsers.delete(socket.id);
 
-    // i will also check if the other exists
+    // Find another available user
     let otherUserId = null;
     for (const user of availableUsers) {
         otherUserId = user;
         break;
     }
 
-    // finding another user
     if (otherUserId) {
         availableUsers.delete(otherUserId);
 
@@ -144,12 +143,14 @@ function matchUsers(socket) {
         io.to(otherUserId).emit("join-room", { roomId, from: socket.id, me: otherUserId });
         socket.emit("join-room", { roomId, from: otherUserId, me: socket.id });
         console.log(`Matched ${socket.id} with ${otherUserId} in room ${roomId}`);
-    }
-    else {
-        availableUsers.add(socket.id);
+    } else {
+        availableUsers.add(socket.id); // Add back if no match found
         socket.emit("waiting", "Waiting for another user...");
     }
+
+    isMatching = false;
 }
+
 
 function leaveRoom(socket, roomId) {
     if (roomId && rooms.has(roomId)) {
