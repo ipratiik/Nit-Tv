@@ -133,7 +133,9 @@ const Room = () => {
       setWaiting(false);
       setMySocketId(me);
       setOtherUserID(from);
-      peerInstance.current = new PeerService();
+      if(!peerInstance.current){
+        peerInstance.current = new PeerService();
+      }
 
       // addinf local stream to the peer connection
       localStream
@@ -306,7 +308,6 @@ const Room = () => {
     // Waiting for another user
     socket.on("waiting", (message) => {
       setWaiting(true);
-      toast.success("Searching NITians...");
     });
 
     // Clear messages

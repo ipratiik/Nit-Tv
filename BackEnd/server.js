@@ -152,7 +152,7 @@ function matchUsers(socket) {
             socket.emit("waiting", "Waiting for another user...");
         }
     } finally {
-        isMatching = false; // Release the lock
+        isMatching = false; 
     }
 }
 
