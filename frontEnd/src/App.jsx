@@ -4,7 +4,7 @@ import Room from "./Components/VideoCalling/screens/Room";
 import Home from "./Components/Home/Home";
 import Maintenance from './Maintenance';
 
-const isUnderMaintenance = false;
+const isUnderMaintenance = true;
 
 function App() {
   return (
